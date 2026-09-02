@@ -117,6 +117,7 @@ function sendOrder() {
   let name = document.getElementById("customer-name").value;
   let phone = document.getElementById("customer-phone").value;
   let address = document.getElementById("customer-address").value;
+  let payment = document.querySelector('input[name="payment"]:checked').value;
 
   if (name === "" || phone === "" || address === "") {
     alert("Заполните имя, номер телефона и адрес");
@@ -145,7 +146,8 @@ ${order}
 
 Имя: ${name}
 Телефон: ${phone}
-Адрес: ${address}`;
+Адрес: ${address}
+Оплата: ${payment}`;
 
   let whatsappNumber = "77781577796";
 
@@ -177,5 +179,64 @@ function closeSuccess() {
   document.getElementById("burger-count").textContent = 0;
 
   document.getElementById("cart-info").textContent =
-    "Корзина: 0 товар — 0 ₸";
+    "0 товар — 0 ₸";
 }
+document.querySelectorAll('input[name="payment"]').forEach(function(radio) {
+  radio.addEventListener("change", function() {
+    let kaspiPayment = document.getElementById("kaspi-payment");
+
+    if (this.value === "Kaspi перевод") {
+      kaspiPayment.style.display = "block";
+    } else {
+      kaspiPayment.style.display = "none";
+    }
+  });
+});
+document.querySelectorAll('input[name="orderType"]').forEach(function(radio) {
+  radio.addEventListener("change", function() {
+
+    let tableField = document.getElementById("table-field");
+    let phoneField = document.getElementById("customer-phone");
+    let addressField = document.getElementById("customer-address");
+
+    if (this.value === "В заведении") {
+      tableField.style.display = "block";
+      phoneField.style.display = "none";
+      addressField.style.display = "none";
+    } else {
+      tableField.style.display = "none";
+      phoneField.style.display = "block";
+      addressField.style.display = "block";
+    }
+
+  });
+});
+document.addEventListener("DOMContentLoaded", function() {
+
+  let orderTypeRadios = document.querySelectorAll('input[name="orderType"]');
+  let tableField = document.getElementById("table-field");
+  let phoneField = document.getElementById("customer-phone");
+  let addressField = document.getElementById("customer-address");
+
+  function updateOrderFields() {
+    let selectedType =
+      document.querySelector('input[name="orderType"]:checked').value;
+
+    if (selectedType === "В заведении") {
+      tableField.style.display = "block";
+      phoneField.style.display = "none";
+      addressField.style.display = "none";
+    } else {
+      tableField.style.display = "none";
+      phoneField.style.display = "block";
+      addressField.style.display = "block";
+    }
+  }
+
+  orderTypeRadios.forEach(function(radio) {
+    radio.addEventListener("change", updateOrderFields);
+  });
+
+  updateOrderFields();
+
+});

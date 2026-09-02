@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,7 +9,7 @@
 
   <link rel="stylesheet" href="style.css">
 </head>
-<script src="script.js"></script>
+
 <body>
 
   <h1>BAI FOOD & SUSHI BAR</h1>
@@ -21,7 +22,9 @@
 
   <h2>Популярное</h2>
 
-  <div>
+
+  <!-- Филадельфия -->
+  <div class="product">
     <img src="images/phelodel.png" alt="Филадельфия">
 
     <h3>Филадельфия</h3>
@@ -36,100 +39,241 @@
   </div>
 
 
- <div>
-  <img src="images/kali.jpg" alt="Калифорния">
-  <h3>Калифорния</h3>
-  <p>2 490 ₸</p>
+  <!-- Калифорния -->
+  <div class="product">
+    <img src="images/kali.jpg" alt="Калифорния">
 
-  <button class="add-button" onclick="removeCalifornia()">−</button>
+    <h3>Калифорния</h3>
 
-  <span id="california-count">0</span>
+    <p>2 490 ₸</p>
 
-  <button class="add-button" onclick="addCalifornia()">+</button>
-</div>
+    <button class="add-button" onclick="removeCalifornia()">−</button>
+
+    <span id="california-count">0</span>
+
+    <button class="add-button" onclick="addCalifornia()">+</button>
+  </div>
 
 
-<div>
+  <!-- Чизбургер -->
+  <div class="product">
     <img src="images/burger.jpg" alt="Чизбургер">
-  <h3>Чизбургер</h3>
-  <p>1 650 ₸</p>
 
-  <button class="add-button" onclick="removeBurger()">−</button>
+    <h3>Чизбургер</h3>
 
-  <span id="burger-count">0</span>
+    <p>1 650 ₸</p>
 
-  <button class="add-button" onclick="addBurger()">+</button>
-</div>
+    <button class="add-button" onclick="removeBurger()">−</button>
+
+    <span id="burger-count">0</span>
+
+    <button class="add-button" onclick="addBurger()">+</button>
+  </div>
+
 
   <hr>
 
-<div class="cart-bar" onclick="openCart()">
- <span>🛒 Корзина</span>
-  <span id="cart-info">0 товаров — 0 ₸</span>
-</div>
-<div id="cart-modal" class="cart-modal">
-  <div class="cart-box">
-    <button class="close-cart" onclick="closeCart()">×</button>
 
-    <h2>Ваш заказ</h2>
-
-    <div id="cart-items"></div>
-
-    <hr>
-
-    <h3 id="cart-total">Итого: 0 ₸</h3>
-    <button class="checkout-button" onclick="openCheckout()">
-  Оформить заказ
-</button>
+  <!-- Корзина -->
+  <div class="cart-bar" onclick="openCart()">
+    <span>🛒 Корзина</span>
+    <span id="cart-info">0 товаров — 0 ₸</span>
   </div>
 
-</div>
-<div id="checkout-modal" class="cart-modal">
-  <div class="cart-box">
 
-    <button class="close-cart" onclick="closeCheckout()">×</button>
+  <!-- Модальное окно корзины -->
+  <div id="cart-modal" class="cart-modal">
 
-    <h2>Оформление заказа</h2>
+    <div class="cart-box">
 
-    <input
-      type="text"
-      id="customer-name"
-      placeholder="Ваше имя"
-    >
+      <button class="close-cart" onclick="closeCart()">×</button>
 
-    <input
-      type="tel"
-      id="customer-phone"
-      placeholder="Номер телефона"
-    >
+      <h2>Ваш заказ</h2>
 
-    <input
-      type="text"
-      id="customer-address"
-      placeholder="Адрес доставки"
-    >
+      <div id="cart-items"></div>
 
-    <button class="checkout-button" onclick="sendOrder()">
-      Отправить заказ
-    </button>
+      <hr>
+
+      <h3 id="cart-total">
+        Итого: 0 ₸
+      </h3>
+
+      <button class="checkout-button" onclick="openCheckout()">
+        Оформить заказ
+      </button>
+
+    </div>
 
   </div>
-</div>  
-<div id="success-modal" class="cart-modal">
-  <div class="cart-box">
 
-    <h2>Заказ принят ✅</h2>
 
-    <p>Спасибо за заказ!</p>
-    <p>Мы скоро свяжемся с вами для подтверждения.</p>
+  <!-- Оформление заказа -->
+  <div id="checkout-modal" class="cart-modal">
 
-    <h3 id="success-total">Итого: 0 ₸</h3>
+    <div class="cart-box">
 
-    <button class="checkout-button" onclick="closeSuccess()">
-      На главную
-    </button>
+      <button class="close-cart" onclick="closeCheckout()">×</button>
+
+      <h2>Оформление заказа</h2>
+
+
+      <!-- Тип заказа -->
+      <div class="order-type">
+
+        <p>Как вы хотите получить заказ?</p>
+
+        <label>
+          <input
+            type="radio"
+            name="orderType"
+            value="В заведении"
+            checked
+          >
+          В заведении
+        </label>
+
+        <label>
+          <input
+            type="radio"
+            name="orderType"
+            value="Доставка"
+          >
+          Доставка
+        </label>
+
+      </div>
+
+
+      <!-- Номер стола -->
+      <div id="table-field">
+
+        <input
+          type="number"
+          id="table-number"
+          placeholder="Номер стола"
+          min="1"
+        >
+
+      </div>
+
+
+      <!-- Имя -->
+      <input
+        type="text"
+        id="customer-name"
+        placeholder="Ваше имя"
+      >
+
+
+      <!-- Телефон -->
+      <input
+        type="tel"
+        id="customer-phone"
+        placeholder="Номер телефона"
+      >
+
+
+      <!-- Адрес -->
+      <input
+        type="text"
+        id="customer-address"
+        placeholder="Адрес доставки"
+      >
+
+
+      <!-- Способ оплаты -->
+      <div class="payment-method">
+
+        <p>Способ оплаты</p>
+
+        <label>
+          <input
+            type="radio"
+            name="payment"
+            value="Наличными"
+            checked
+          >
+          Наличными
+        </label>
+
+        <label>
+          <input
+            type="radio"
+            name="payment"
+            value="Kaspi перевод"
+          >
+          Kaspi перевод
+        </label>
+
+      </div>
+
+
+      <!-- Kaspi -->
+      <div
+        id="kaspi-payment"
+        style="display: none;"
+      >
+
+        <p>Оплата через Kaspi</p>
+
+        <p>
+          После оформления заказа оплатите по Kaspi.
+        </p>
+
+      </div>
+
+
+      <button
+        class="checkout-button"
+        onclick="sendOrder()"
+      >
+        Отправить заказ
+      </button>
+
+    </div>
 
   </div>
-</div>
+
+
+  <!-- Заказ принят -->
+  <div
+    id="success-modal"
+    class="cart-modal"
+  >
+
+    <div class="cart-box">
+
+      <h2>
+        Заказ принят ✅
+      </h2>
+
+      <p>
+        Спасибо за заказ!
+      </p>
+
+      <p>
+        Мы скоро свяжемся с вами для подтверждения.
+      </p>
+
+      <h3 id="success-total">
+        Итого: 0 ₸
+      </h3>
+
+      <button
+        class="checkout-button"
+        onclick="closeSuccess()"
+      >
+        На главную
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- JavaScript -->
+  <script src="script.js"></script>
+
 </body>
+
 </html>
