@@ -12,83 +12,400 @@
 
 <body>
 
-  <h1>BAI FOOD & SUSHI BAR</h1>
+  <!-- Басты экран -->
+  <header class="hero">
 
-  <p>Бактыбай</p>
-  <p>10:00 - 22:00</p>
-  <p>Доставка есть</p>
+    <nav class="navbar">
 
-  <hr>
+      <div class="brand">
+        <div class="brand-logo">🍣</div>
 
-  <h2>Популярное</h2>
+        <div class="brand-text">
+          <strong>BAI FOOD</strong>
+          <span>& SUSHI BAR</span>
+        </div>
+      </div>
 
+      <button class="menu-button">
+        ☰
+      </button>
 
-  <!-- Филадельфия -->
-  <div class="product">
-    <img src="images/phelodel.png" alt="Филадельфия">
-
-    <h3>Филадельфия</h3>
-
-    <p>2 790 ₸</p>
-
-    <button class="add-button" onclick="removeFromCart()">−</button>
-
-    <span id="item-count">0</span>
-
-    <button class="add-button" onclick="addToCart()">+</button>
-  </div>
+    </nav>
 
 
-  <!-- Калифорния -->
-  <div class="product">
-    <img src="images/kali.jpg" alt="Калифорния">
+    <div class="hero-content">
 
-    <h3>Калифорния</h3>
+      <div class="open-badge">
+        ● Мы открыты!
+      </div>
 
-    <p>2 490 ₸</p>
+      <h1>
+        ВКУС, КОТОРЫЙ
+        <span>ХОЧЕТСЯ ПОВТОРЯТЬ</span>
+      </h1>
 
-    <button class="add-button" onclick="removeCalifornia()">−</button>
-
-    <span id="california-count">0</span>
-
-    <button class="add-button" onclick="addCalifornia()">+</button>
-  </div>
-
-
-  <!-- Чизбургер -->
-  <div class="product">
-    <img src="images/burger.jpg" alt="Чизбургер">
-
-    <h3>Чизбургер</h3>
-
-    <p>1 650 ₸</p>
-
-    <button class="add-button" onclick="removeBurger()">−</button>
-
-    <span id="burger-count">0</span>
-
-    <button class="add-button" onclick="addBurger()">+</button>
-  </div>
+      <p class="hero-description">
+        Суши, роллы, бургеры и многое другое
+        с доставкой в Бактыбай
+      </p>
 
 
-  <hr>
+      <div class="hero-info">
+
+        <div>
+          <span class="info-icon">◷</span>
+          <span>10:00 – 22:00</span>
+        </div>
+
+        <div>
+          <span class="info-icon">🚚</span>
+          <span>Доставка есть</span>
+        </div>
+
+      </div>
+
+
+      <button
+        class="main-menu-button"
+        onclick="document.getElementById('popular').scrollIntoView({behavior:'smooth'})"
+      >
+        📖 Смотреть меню
+      </button>
+
+    </div>
+
+  </header>
+
+
+  <!-- Артықшылықтар -->
+  <section class="features">
+
+    <div class="feature-item">
+      <span>✨</span>
+      <p>Свежие<br>продукты</p>
+    </div>
+
+    <div class="feature-item">
+      <span>🚚</span>
+      <p>Быстрая<br>доставка</p>
+    </div>
+
+    <div class="feature-item">
+      <span>🍱</span>
+      <p>Большие<br>порции</p>
+    </div>
+
+    <div class="feature-item">
+      <span>💳</span>
+      <p>Kaspi /<br>Наличные</p>
+    </div>
+
+  </section>
+
+
+  <!-- Категориялар -->
+  <section class="categories-section">
+
+    <h2>Категории</h2>
+
+    <div class="categories">
+
+      <button class="category active">
+        <span>🔥</span>
+        Популярное
+      </button>
+
+      <button class="category">
+        <span>🍣</span>
+        Роллы
+      </button>
+
+      <button class="category">
+        <span>🍱</span>
+        Сеты
+      </button>
+
+      <button class="category">
+        <span>🍔</span>
+        Бургеры
+      </button>
+
+      <button class="category">
+        <span>🍕</span>
+        Пицца
+      </button>
+
+      <button class="category">
+        <span>🍜</span>
+        Рамен
+      </button>
+
+      <button class="category">
+        <span>🍣</span>
+        Суши
+      </button>
+
+      <button class="category">
+        <span>🥤</span>
+        Напитки
+      </button>
+
+    </div>
+
+  </section>
+
+
+  <!-- Популярное -->
+  <main class="menu-section" id="popular">
+
+    <div class="section-title">
+
+      <h2>
+        🔥 Популярное
+      </h2>
+
+      <span>
+        Смотреть все →
+      </span>
+
+    </div>
+
+
+    <div class="products-grid">
+
+
+      <!-- Филадельфия -->
+      <article class="product">
+
+        <div class="product-image">
+
+          <span class="hit-badge">
+            ХИТ
+          </span>
+
+          <img
+            src="images/phelodel.png"
+            alt="Филадельфия"
+          >
+
+        </div>
+
+
+        <div class="product-content">
+
+          <h3>
+            Филадельфия
+          </h3>
+
+          <p class="product-description">
+            Лосось, сливочный сыр, огурец
+          </p>
+
+
+          <div class="product-bottom">
+
+            <strong class="price">
+              2 790 ₸
+            </strong>
+
+
+            <div class="quantity">
+
+              <button
+                class="minus-button"
+                onclick="removeFromCart()"
+              >
+                −
+              </button>
+
+              <span id="item-count">
+                0
+              </span>
+
+              <button
+                class="add-button"
+                onclick="addToCart()"
+              >
+                +
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </article>
+
+
+
+      <!-- Калифорния -->
+      <article class="product">
+
+        <div class="product-image">
+
+          <img
+            src="images/kali.jpg"
+            alt="Калифорния"
+          >
+
+        </div>
+
+
+        <div class="product-content">
+
+          <h3>
+            Калифорния
+          </h3>
+
+          <p class="product-description">
+            Краб, огурец, икра масаго
+          </p>
+
+
+          <div class="product-bottom">
+
+            <strong class="price">
+              2 490 ₸
+            </strong>
+
+
+            <div class="quantity">
+
+              <button
+                class="minus-button"
+                onclick="removeCalifornia()"
+              >
+                −
+              </button>
+
+              <span id="california-count">
+                0
+              </span>
+
+              <button
+                class="add-button"
+                onclick="addCalifornia()"
+              >
+                +
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </article>
+
+
+
+      <!-- Чизбургер -->
+      <article class="product">
+
+        <div class="product-image">
+
+          <img
+            src="images/burger.jpg"
+            alt="Чизбургер"
+          >
+
+        </div>
+
+
+        <div class="product-content">
+
+          <h3>
+            Чизбургер
+          </h3>
+
+          <p class="product-description">
+            Говяжья котлета, сыр, овощи, соус
+          </p>
+
+
+          <div class="product-bottom">
+
+            <strong class="price">
+              1 650 ₸
+            </strong>
+
+
+            <div class="quantity">
+
+              <button
+                class="minus-button"
+                onclick="removeBurger()"
+              >
+                −
+              </button>
+
+              <span id="burger-count">
+                0
+              </span>
+
+              <button
+                class="add-button"
+                onclick="addBurger()"
+              >
+                +
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </article>
+
+    </div>
+
+  </main>
+
 
 
   <!-- Корзина -->
-  <div class="cart-bar" onclick="openCart()">
-    <span>🛒 Корзина</span>
-    <span id="cart-info">0 товаров — 0 ₸</span>
+  <div
+    class="cart-bar"
+    onclick="openCart()"
+  >
+
+    <div class="cart-left">
+      🛒
+      <span>Корзина</span>
+    </div>
+
+    <span id="cart-info">
+      0 товаров — 0 ₸
+    </span>
+
+    <span class="cart-arrow">
+      ›
+    </span>
+
   </div>
 
 
-  <!-- Модальное окно корзины -->
-  <div id="cart-modal" class="cart-modal">
+
+  <!-- Корзина модалы -->
+  <div
+    id="cart-modal"
+    class="cart-modal"
+  >
 
     <div class="cart-box">
 
-      <button class="close-cart" onclick="closeCart()">×</button>
+      <button
+        class="close-cart"
+        onclick="closeCart()"
+      >
+        ×
+      </button>
 
-      <h2>Ваш заказ</h2>
+      <h2>
+        Ваш заказ
+      </h2>
 
       <div id="cart-items"></div>
 
@@ -98,7 +415,10 @@
         Итого: 0 ₸
       </h3>
 
-      <button class="checkout-button" onclick="openCheckout()">
+      <button
+        class="checkout-button"
+        onclick="openCheckout()"
+      >
         Оформить заказ
       </button>
 
@@ -107,41 +427,64 @@
   </div>
 
 
+
   <!-- Оформление заказа -->
-  <div id="checkout-modal" class="cart-modal">
+  <div
+    id="checkout-modal"
+    class="cart-modal"
+  >
 
     <div class="cart-box">
 
-      <button class="close-cart" onclick="closeCheckout()">×</button>
+      <button
+        class="close-cart"
+        onclick="closeCheckout()"
+      >
+        ×
+      </button>
 
-      <h2>Оформление заказа</h2>
+
+      <h2>
+        Оформление заказа
+      </h2>
 
 
       <!-- Тип заказа -->
       <div class="order-type">
 
-        <p>Как вы хотите получить заказ?</p>
+        <p>
+          Как вы хотите получить заказ?
+        </p>
+
 
         <label>
+
           <input
             type="radio"
             name="orderType"
             value="В заведении"
             checked
           >
+
           В заведении
+
         </label>
 
+
         <label>
+
           <input
             type="radio"
             name="orderType"
             value="Доставка"
           >
+
           Доставка
+
         </label>
 
       </div>
+
 
 
       <!-- Номер стола -->
@@ -157,7 +500,7 @@
       </div>
 
 
-      <!-- Имя -->
+
       <input
         type="text"
         id="customer-name"
@@ -165,7 +508,6 @@
       >
 
 
-      <!-- Телефон -->
       <input
         type="tel"
         id="customer-phone"
@@ -173,7 +515,6 @@
       >
 
 
-      <!-- Адрес -->
       <input
         type="text"
         id="customer-address"
@@ -181,31 +522,43 @@
       >
 
 
-      <!-- Способ оплаты -->
+
+      <!-- Оплата -->
       <div class="payment-method">
 
-        <p>Способ оплаты</p>
+        <p>
+          Способ оплаты
+        </p>
+
 
         <label>
+
           <input
             type="radio"
             name="payment"
             value="Наличными"
             checked
           >
+
           Наличными
+
         </label>
 
+
         <label>
+
           <input
             type="radio"
             name="payment"
             value="Kaspi перевод"
           >
+
           Kaspi перевод
+
         </label>
 
       </div>
+
 
 
       <!-- Kaspi -->
@@ -214,13 +567,16 @@
         style="display: none;"
       >
 
-        <p>Оплата через Kaspi</p>
+        <p>
+          Оплата через Kaspi
+        </p>
 
         <p>
           После оформления заказа оплатите по Kaspi.
         </p>
 
       </div>
+
 
 
       <button
@@ -235,16 +591,21 @@
   </div>
 
 
+
   <!-- Заказ принят -->
   <div
     id="success-modal"
     class="cart-modal"
   >
 
-    <div class="cart-box">
+    <div class="cart-box success-box">
+
+      <div class="success-icon">
+        ✓
+      </div>
 
       <h2>
-        Заказ принят ✅
+        Заказ принят
       </h2>
 
       <p>
@@ -271,7 +632,6 @@
   </div>
 
 
-  <!-- JavaScript -->
   <script src="script.js"></script>
 
 </body>

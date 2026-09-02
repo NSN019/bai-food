@@ -117,10 +117,26 @@ function sendOrder() {
   let name = document.getElementById("customer-name").value;
   let phone = document.getElementById("customer-phone").value;
   let address = document.getElementById("customer-address").value;
-  let payment = document.querySelector('input[name="payment"]:checked').value;
+  let tableNumber = document.getElementById("table-number").value;
 
-  if (name === "" || phone === "" || address === "") {
-    alert("Заполните имя, номер телефона и адрес");
+  let payment =
+    document.querySelector('input[name="payment"]:checked').value;
+
+  let orderType =
+    document.querySelector('input[name="orderType"]:checked').value;
+
+  if (name === "") {
+    alert("Заполните имя");
+    return;
+  }
+
+  if (orderType === "В заведении" && tableNumber === "") {
+    alert("Укажите номер стола");
+    return;
+  }
+
+  if (orderType === "Доставка" && (phone === "" || address === "")) {
+    alert("Заполните номер телефона и адрес");
     return;
   }
 
@@ -138,15 +154,29 @@ function sendOrder() {
     order += `Чизбургер × ${burgerCount} — ${burgerCount * 1650} ₸\n`;
   }
 
-  let message =
-`Новый заказ 🍣
+  let customerInfo = "";
+
+if (orderType === "В заведении") {
+  customerInfo =
+`Тип заказа: В заведении
+Имя: ${name}
+Стол: ${tableNumber}`;
+} else {
+  customerInfo =
+`Тип заказа: Доставка
+Имя: ${name}
+Телефон: ${phone}
+Адрес: ${address}`;
+}
+
+let message =
+`Новый заказ 🍔
 
 ${order}
 Итого: ${cartTotal} ₸
 
-Имя: ${name}
-Телефон: ${phone}
-Адрес: ${address}
+${customerInfo}
+
 Оплата: ${payment}`;
 
   let whatsappNumber = "77781577796";
