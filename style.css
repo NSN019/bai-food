@@ -31,17 +31,17 @@ button {
   position: relative;
 
   background:
-    radial-gradient(
-      circle at 70% 25%,
-      rgba(255, 59, 48, 0.18),
-      transparent 35%
-    ),
-    linear-gradient(
-      180deg,
-      #111111 0%,
-      #090909 70%,
-      #080808 100%
-    );
+  linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.95) 0%,
+    rgba(0, 0, 0, 0.78) 45%,
+    rgba(0, 0, 0, 0.30) 100%
+  ),
+  url("images/hero.jpg");
+
+background-size: cover;
+background-position: center;
+background-repeat: no-repeat;
 
   overflow: hidden;
 }
