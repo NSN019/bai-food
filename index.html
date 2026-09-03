@@ -18,12 +18,16 @@
     <nav class="navbar">
 
       <div class="brand">
-        <div class="brand-logo">🍣</div>
+
+        <div class="brand-logo">
+          🍣
+        </div>
 
         <div class="brand-text">
           <strong>BAI FOOD</strong>
           <span>& SUSHI BAR</span>
         </div>
+
       </div>
 
       <button class="menu-button">
@@ -110,42 +114,28 @@
 
     <div class="categories">
 
-      <button class="category active">
+      <button
+        class="category active"
+        onclick="document.getElementById('popular').scrollIntoView({behavior:'smooth'})"
+      >
         <span>🔥</span>
         Популярное
       </button>
 
-      <button class="category">
+
+      <button
+        class="category"
+        onclick="document.getElementById('rolls').scrollIntoView({behavior:'smooth'})"
+      >
         <span>🍣</span>
         Роллы
       </button>
 
-      <button class="category">
-        <span>🍱</span>
-        Сеты
-      </button>
 
-      <button class="category">
-        <span>🍔</span>
-        Бургеры
-      </button>
-
-      <button class="category">
-        <span>🍕</span>
-        Пицца
-      </button>
-
-      <button class="category">
-        <span>🍜</span>
-        Рамен
-      </button>
-
-      <button class="category">
-        <span>🍣</span>
-        Суши
-      </button>
-
-      <button class="category">
+      <button
+        class="category"
+        onclick="document.getElementById('drinks').scrollIntoView({behavior:'smooth'})"
+      >
         <span>🥤</span>
         Напитки
       </button>
@@ -155,7 +145,10 @@
   </section>
 
 
-  <!-- Популярное -->
+  <!-- ========================= -->
+  <!-- ПОПУЛЯРНОЕ -->
+  <!-- ========================= -->
+
   <main class="menu-section" id="popular">
 
     <div class="section-title">
@@ -165,7 +158,7 @@
       </h2>
 
       <span>
-        Смотреть все →
+        BAI FOOD
       </span>
 
     </div>
@@ -238,7 +231,6 @@
       </article>
 
 
-
       <!-- Калифорния -->
       <article class="product">
 
@@ -297,7 +289,6 @@
         </div>
 
       </article>
-
 
 
       <!-- Чизбургер -->
@@ -364,8 +355,422 @@
   </main>
 
 
+  <!-- ========================= -->
+  <!-- РОЛЛЫ -->
+  <!-- ========================= -->
 
-  <!-- Корзина -->
+  <section class="menu-section" id="rolls">
+
+    <div class="section-title">
+
+      <h2>
+        🍣 Роллы
+      </h2>
+
+      <span>
+        BAI FOOD
+      </span>
+
+    </div>
+
+
+    <div class="products-grid">
+
+
+      <!-- Аляска -->
+      <article class="product">
+
+        <div class="product-image">
+
+          <img
+            src="images/alaska.jpg"
+            alt="Аляска"
+          >
+
+        </div>
+
+
+        <div class="product-content">
+
+          <h3>
+            Аляска
+          </h3>
+
+          <p class="product-description">
+            Ролл Аляска
+          </p>
+
+
+          <div class="product-bottom">
+
+            <strong class="price">
+              2 390 ₸
+            </strong>
+
+
+            <div class="quantity">
+
+              <button
+                class="minus-button"
+                onclick="removeAlaska()"
+              >
+                −
+              </button>
+
+              <span id="alaska-count">
+                0
+              </span>
+
+              <button
+                class="add-button"
+                onclick="addAlaska()"
+              >
+                +
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </article>
+
+
+      <!-- Бонито -->
+      <article class="product">
+
+        <div class="product-image">
+
+          <img
+            src="images/bonito.jpg"
+            alt="Бонито"
+          >
+
+        </div>
+
+
+        <div class="product-content">
+
+          <h3>
+            Бонито
+          </h3>
+
+          <p class="product-description">
+            Ролл Бонито
+          </p>
+
+
+          <div class="product-bottom">
+
+            <strong class="price">
+              2 190 ₸
+            </strong>
+
+
+            <div class="quantity">
+
+              <button
+                class="minus-button"
+                onclick="removeBonito()"
+              >
+                −
+              </button>
+
+              <span id="bonito-count">
+                0
+              </span>
+
+              <button
+                class="add-button"
+                onclick="addBonito()"
+              >
+                +
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </article>
+
+    </div>
+
+  </section>
+
+
+  <!-- ========================= -->
+  <!-- НАПИТКИ -->
+  <!-- ========================= -->
+
+  <section class="menu-section" id="drinks">
+
+    <div class="section-title">
+
+      <h2>
+        🥤 Напитки
+      </h2>
+
+      <span>
+        BAI FOOD
+      </span>
+
+    </div>
+
+
+    <div class="products-grid">
+
+
+      <!-- Bubble Tea 0.5 -->
+      <article class="product">
+
+        <div class="product-image">
+
+          <img
+            src="images/bubble-tea-05.jpg"
+            alt="Bubble Tea 0.5 л"
+          >
+
+        </div>
+
+
+        <div class="product-content">
+
+          <h3>
+            Bubble Tea 0.5 л
+          </h3>
+
+          <p class="product-description">
+            Клубника, батат, шоколад, Oreo, таро, сникерс, сливочный, ганконг, банан
+          </p>
+
+
+          <div class="product-bottom">
+
+            <strong class="price">
+              1 300 ₸
+            </strong>
+
+
+            <div class="quantity">
+
+              <button
+                class="minus-button"
+                onclick="removeBubble05()"
+              >
+                −
+              </button>
+
+              <span id="bubble05-count">
+                0
+              </span>
+
+              <button
+                class="add-button"
+                onclick="addBubble05()"
+              >
+                +
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </article>
+
+
+      <!-- Bubble Tea 0.7 -->
+      <article class="product">
+
+        <div class="product-image">
+
+          <img
+            src="images/bubble-tea-07.jpg"
+            alt="Bubble Tea 0.7 л"
+          >
+
+        </div>
+
+
+        <div class="product-content">
+
+          <h3>
+            Bubble Tea 0.7 л
+          </h3>
+
+          <p class="product-description">
+            Клубника, батат, шоколад, Oreo, таро, сникерс, сливочный, ганконг, банан
+          </p>
+
+
+          <div class="product-bottom">
+
+            <strong class="price">
+              1 500 ₸
+            </strong>
+
+
+            <div class="quantity">
+
+              <button
+                class="minus-button"
+                onclick="removeBubble07()"
+              >
+                −
+              </button>
+
+              <span id="bubble07-count">
+                0
+              </span>
+
+              <button
+                class="add-button"
+                onclick="addBubble07()"
+              >
+                +
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </article>
+
+
+      <!-- Лимонад 0.5 -->
+      <article class="product">
+
+        <div class="product-image">
+
+          <img
+            src="images/lemonade-05.jpg"
+            alt="Лимонад 0.5 л"
+          >
+
+        </div>
+
+
+        <div class="product-content">
+
+          <h3>
+            Лимонад 0.5 л
+          </h3>
+
+          <p class="product-description">
+            Манго-маракуйя, киви, ягодный, мохито
+          </p>
+
+
+          <div class="product-bottom">
+
+            <strong class="price">
+              700 ₸
+            </strong>
+
+
+            <div class="quantity">
+
+              <button
+                class="minus-button"
+                onclick="removeLemonade05()"
+              >
+                −
+              </button>
+
+              <span id="lemonade05-count">
+                0
+              </span>
+
+              <button
+                class="add-button"
+                onclick="addLemonade05()"
+              >
+                +
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </article>
+
+
+      <!-- Лимонад 0.7 -->
+      <article class="product">
+
+        <div class="product-image">
+
+          <img
+            src="images/lemonade-07.jpg"
+            alt="Лимонад 0.7 л"
+          >
+
+        </div>
+
+
+        <div class="product-content">
+
+          <h3>
+            Лимонад 0.7 л
+          </h3>
+
+          <p class="product-description">
+            Манго-маракуйя, киви, ягодный, мохито
+          </p>
+
+
+          <div class="product-bottom">
+
+            <strong class="price">
+              900 ₸
+            </strong>
+
+
+            <div class="quantity">
+
+              <button
+                class="minus-button"
+                onclick="removeLemonade07()"
+              >
+                −
+              </button>
+
+              <span id="lemonade07-count">
+                0
+              </span>
+
+              <button
+                class="add-button"
+                onclick="addLemonade07()"
+              >
+                +
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </article>
+
+    </div>
+
+  </section>
+
+
+  <!-- ========================= -->
+  <!-- КОРЗИНА -->
+  <!-- ========================= -->
+
   <div
     class="cart-bar"
     onclick="openCart()"
@@ -385,7 +790,6 @@
     </span>
 
   </div>
-
 
 
   <!-- Корзина модалы -->
@@ -427,8 +831,10 @@
   </div>
 
 
+  <!-- ========================= -->
+  <!-- ОФОРМЛЕНИЕ -->
+  <!-- ========================= -->
 
-  <!-- Оформление заказа -->
   <div
     id="checkout-modal"
     class="cart-modal"
@@ -443,7 +849,6 @@
         ×
       </button>
 
-
       <h2>
         Оформление заказа
       </h2>
@@ -455,7 +860,6 @@
         <p>
           Как вы хотите получить заказ?
         </p>
-
 
         <label>
 
@@ -486,7 +890,6 @@
       </div>
 
 
-
       <!-- Номер стола -->
       <div id="table-field">
 
@@ -498,7 +901,6 @@
         >
 
       </div>
-
 
 
       <input
@@ -520,7 +922,6 @@
         id="customer-address"
         placeholder="Адрес доставки"
       >
-
 
 
       <!-- Оплата -->
@@ -560,7 +961,6 @@
       </div>
 
 
-
       <!-- Kaspi -->
       <div
         id="kaspi-payment"
@@ -578,7 +978,6 @@
       </div>
 
 
-
       <button
         class="checkout-button"
         onclick="sendOrder()"
@@ -591,8 +990,10 @@
   </div>
 
 
+  <!-- ========================= -->
+  <!-- ЗАКАЗ ПРИНЯТ -->
+  <!-- ========================= -->
 
-  <!-- Заказ принят -->
   <div
     id="success-modal"
     class="cart-modal"
