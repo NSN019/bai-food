@@ -444,18 +444,26 @@ function closeCheckout() {
 
 async function saveOrderToSupabase(order) {
   const response = await fetch(
-    `${SUPABASE_URL}/rest/v1/orders`,
+    `${SUPABASE_URL}/rest/v1/rpc/create_order`,
     {
       method: "POST",
 
       headers: {
         "Content-Type": "application/json",
         "apikey": SUPABASE_ANON_KEY,
-        "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
-        "Prefer": "return=representation"
+        "Authorization": `Bearer ${SUPABASE_ANON_KEY}`
       },
 
-      body: JSON.stringify(order)
+      body: JSON.stringify({
+        p_customer_name: order.customer_name,
+        p_phone: order.phone,
+        p_order_type: order.order_type,
+        p_table_number: order.table_number,
+        p_address: order.address,
+        p_items: order.items,
+        p_total: order.total,
+        p_payment_method: order.payment_method
+      })
     }
   );
 
@@ -467,9 +475,11 @@ async function saveOrderToSupabase(order) {
     throw new Error(errorText);
   }
 
-  const data = await response.json();
+  const orderId = await response.json();
 
-  return data[0];
+  return {
+    id: orderId
+  };
 }
 
 
