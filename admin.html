@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>BAI FOOD — Касса</title>
+
+  <link rel="stylesheet" href="admin.css">
+</head>
+
+<body>
+
+<header class="topbar">
+  <div>
+    <p class="small-title">BAI FOOD & SUSHI BAR</p>
+    <h1>Касса</h1>
+  </div>
+
+  <div class="status-online">
+    <span></span>
+    Онлайн
+  </div>
+</header>
+
+
+<main class="container">
+
+  <section class="stats">
+
+    <div class="stat-card">
+      <span>Ожидают оплаты</span>
+      <strong id="waiting-count">0</strong>
+    </div>
+
+    <div class="stat-card">
+      <span>Оплачено</span>
+      <strong id="paid-count">0</strong>
+    </div>
+
+    <div class="stat-card">
+      <span>Выручка</span>
+      <strong id="revenue">0 ₸</strong>
+    </div>
+
+  </section>
+
+
+  <section class="toolbar">
+
+    <div>
+      <h2>Заказы</h2>
+      <p>Заказы обновляются автоматически</p>
+    </div>
+
+    <button
+      class="refresh-button"
+      onclick="renderOrders()"
+    >
+      ↻ Обновить
+    </button>
+
+  </section>
+
+
+  <div class="tabs">
+
+    <button
+      class="tab active"
+      onclick="setFilter('waiting', this)"
+    >
+      Ожидают оплаты
+    </button>
+
+    <button
+      class="tab"
+      onclick="setFilter('paid', this)"
+    >
+      Оплачено
+    </button>
+
+    <button
+      class="tab"
+      onclick="setFilter('all', this)"
+    >
+      Все
+    </button>
+
+  </div>
+
+
+  <section
+    id="orders"
+    class="orders"
+  >
+  </section>
+
+
+  <div
+    id="empty-state"
+    class="empty-state"
+  >
+    <div>🍣</div>
+    <h3>Нет заказов</h3>
+    <p>Новые заказы появятся здесь</p>
+  </div>
+
+</main>
+
+
+<div
+  id="confirm-modal"
+  class="modal"
+>
+
+  <div class="modal-box">
+
+    <div class="modal-icon">
+      💵
+    </div>
+
+    <h2>
+      Подтвердить оплату?
+    </h2>
+
+    <p id="confirm-text">
+      Заказ
+    </p>
+
+    <div class="modal-actions">
+
+      <button
+        class="cancel-button"
+        onclick="closeConfirmModal()"
+      >
+        Отмена
+      </button>
+
+      <button
+        class="confirm-button"
+        onclick="confirmCashPayment()"
+      >
+        ✓ Оплачено
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<div
+  id="toast"
+  class="toast"
+>
+  ✓ Оплата подтверждена
+</div>
+
+
+<script src="admin.js"></script>
+
+</body>
+</html>
