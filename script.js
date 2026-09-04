@@ -1,15 +1,23 @@
+// ===============================
+// BAI FOOD — CLIENT + SUPABASE
+// ===============================
+
+const SUPABASE_URL = "https://elzjmbwkgleuzpybiqdg.supabase.co";
+
+const SUPABASE_ANON_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVsemptYndrZ2xldXpweWJpcWRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg1MDA1OTEsImV4cCI6MjEwNDA3NjU5MX0.JtcrSCdtV20YrMIyqYI66SjywOgGa4CVRqFRdpCujLg";
+
+
+// ===============================
+// КОРЗИНА
+// ===============================
+
 let cartCount = 0;
 let cartTotal = 0;
-
-
-// ==============================
-// ТОВАР САНЫ
-// ==============================
 
 let philadelphiaCount = 0;
 let californiaCount = 0;
 let burgerCount = 0;
-
 let alaskaCount = 0;
 let bonitoCount = 0;
 
@@ -19,924 +27,743 @@ let lemonade05Count = 0;
 let lemonade07Count = 0;
 
 
-// ==============================
-// КОРЗИНА АҚПАРАТЫ
-// ==============================
+// ===============================
+// ОБНОВЛЕНИЕ КОРЗИНЫ
+// ===============================
 
 function updateCartInfo() {
+  const cartInfo = document.getElementById("cart-info");
 
-  document.getElementById("cart-info").textContent =
-    `${cartCount} товар — ${cartTotal} ₸`;
-
+  if (cartInfo) {
+    cartInfo.textContent =
+      `${cartCount} товар — ${cartTotal.toLocaleString("ru-RU")} ₸`;
+  }
 }
 
 
-// ==============================
-// + / - БАТЫРМАЛАРЫ
-// ==============================
-
 function updateQuantityControl(countId, count) {
+  const countElement = document.getElementById(countId);
 
-  let countElement =
-    document.getElementById(countId);
+  if (!countElement) return;
 
-  let quantity =
-    countElement.closest(".quantity");
+  const quantity = countElement.closest(".quantity");
 
-  let minusButton =
-    quantity.querySelector(".minus-button");
+  if (!quantity) return;
 
+  const minusButton = quantity.querySelector(".minus-button");
 
   countElement.textContent = count;
 
-
-  if (count === 0) {
-
-    minusButton.style.display = "none";
+  if (count <= 0) {
     countElement.style.display = "none";
 
+    if (minusButton) {
+      minusButton.style.display = "none";
+    }
   } else {
+    countElement.style.display = "inline-flex";
 
-    minusButton.style.display = "flex";
-    countElement.style.display = "inline";
-
+    if (minusButton) {
+      minusButton.style.display = "inline-flex";
+    }
   }
-
 }
 
 
-// ==============================
+// ===============================
 // ФИЛАДЕЛЬФИЯ
-// ==============================
+// ===============================
 
 function addToCart() {
-
   philadelphiaCount++;
   cartCount++;
   cartTotal += 2790;
 
-  updateQuantityControl(
-    "item-count",
-    philadelphiaCount
-  );
+  updateQuantityControl("item-count", philadelphiaCount);
+  updateCartInfo();
+}
 
+function removeFromCart() {
+  if (philadelphiaCount <= 0) return;
+
+  philadelphiaCount--;
+  cartCount--;
+  cartTotal -= 2790;
+
+  updateQuantityControl("item-count", philadelphiaCount);
   updateCartInfo();
 }
 
 
-function removeFromCart() {
-
-  if (philadelphiaCount > 0) {
-
-    philadelphiaCount--;
-    cartCount--;
-    cartTotal -= 2790;
-
-    updateQuantityControl(
-      "item-count",
-      philadelphiaCount
-    );
-
-    updateCartInfo();
-
-  }
-
-}
-
-
-// ==============================
+// ===============================
 // КАЛИФОРНИЯ
-// ==============================
+// ===============================
 
 function addCalifornia() {
-
   californiaCount++;
   cartCount++;
   cartTotal += 2490;
 
-  updateQuantityControl(
-    "california-count",
-    californiaCount
-  );
+  updateQuantityControl("california-count", californiaCount);
+  updateCartInfo();
+}
 
+function removeCalifornia() {
+  if (californiaCount <= 0) return;
+
+  californiaCount--;
+  cartCount--;
+  cartTotal -= 2490;
+
+  updateQuantityControl("california-count", californiaCount);
   updateCartInfo();
 }
 
 
-function removeCalifornia() {
-
-  if (californiaCount > 0) {
-
-    californiaCount--;
-    cartCount--;
-    cartTotal -= 2490;
-
-    updateQuantityControl(
-      "california-count",
-      californiaCount
-    );
-
-    updateCartInfo();
-
-  }
-
-}
-
-
-// ==============================
+// ===============================
 // ЧИЗБУРГЕР
-// ==============================
+// ===============================
 
 function addBurger() {
-
   burgerCount++;
   cartCount++;
   cartTotal += 1650;
 
-  updateQuantityControl(
-    "burger-count",
-    burgerCount
-  );
+  updateQuantityControl("burger-count", burgerCount);
+  updateCartInfo();
+}
 
+function removeBurger() {
+  if (burgerCount <= 0) return;
+
+  burgerCount--;
+  cartCount--;
+  cartTotal -= 1650;
+
+  updateQuantityControl("burger-count", burgerCount);
   updateCartInfo();
 }
 
 
-function removeBurger() {
-
-  if (burgerCount > 0) {
-
-    burgerCount--;
-    cartCount--;
-    cartTotal -= 1650;
-
-    updateQuantityControl(
-      "burger-count",
-      burgerCount
-    );
-
-    updateCartInfo();
-
-  }
-
-}
-
-
-// ==============================
+// ===============================
 // АЛЯСКА
-// ==============================
+// ===============================
 
 function addAlaska() {
-
   alaskaCount++;
   cartCount++;
   cartTotal += 2390;
 
-  updateQuantityControl(
-    "alaska-count",
-    alaskaCount
-  );
+  updateQuantityControl("alaska-count", alaskaCount);
+  updateCartInfo();
+}
 
+function removeAlaska() {
+  if (alaskaCount <= 0) return;
+
+  alaskaCount--;
+  cartCount--;
+  cartTotal -= 2390;
+
+  updateQuantityControl("alaska-count", alaskaCount);
   updateCartInfo();
 }
 
 
-function removeAlaska() {
-
-  if (alaskaCount > 0) {
-
-    alaskaCount--;
-    cartCount--;
-    cartTotal -= 2390;
-
-    updateQuantityControl(
-      "alaska-count",
-      alaskaCount
-    );
-
-    updateCartInfo();
-
-  }
-
-}
-
-
-// ==============================
+// ===============================
 // БОНИТО
-// ==============================
+// ===============================
 
 function addBonito() {
-
   bonitoCount++;
   cartCount++;
   cartTotal += 2190;
 
-  updateQuantityControl(
-    "bonito-count",
-    bonitoCount
-  );
+  updateQuantityControl("bonito-count", bonitoCount);
+  updateCartInfo();
+}
 
+function removeBonito() {
+  if (bonitoCount <= 0) return;
+
+  bonitoCount--;
+  cartCount--;
+  cartTotal -= 2190;
+
+  updateQuantityControl("bonito-count", bonitoCount);
   updateCartInfo();
 }
 
 
-function removeBonito() {
-
-  if (bonitoCount > 0) {
-
-    bonitoCount--;
-    cartCount--;
-    cartTotal -= 2190;
-
-    updateQuantityControl(
-      "bonito-count",
-      bonitoCount
-    );
-
-    updateCartInfo();
-
-  }
-
-}
-
-
-// ==============================
+// ===============================
 // BUBBLE TEA 0.5
-// ==============================
+// ===============================
 
 function addBubble05() {
-
   bubble05Count++;
   cartCount++;
   cartTotal += 1300;
 
-  updateQuantityControl(
-    "bubble05-count",
-    bubble05Count
-  );
+  updateQuantityControl("bubble05-count", bubble05Count);
+  updateCartInfo();
+}
 
+function removeBubble05() {
+  if (bubble05Count <= 0) return;
+
+  bubble05Count--;
+  cartCount--;
+  cartTotal -= 1300;
+
+  updateQuantityControl("bubble05-count", bubble05Count);
   updateCartInfo();
 }
 
 
-function removeBubble05() {
-
-  if (bubble05Count > 0) {
-
-    bubble05Count--;
-    cartCount--;
-    cartTotal -= 1300;
-
-    updateQuantityControl(
-      "bubble05-count",
-      bubble05Count
-    );
-
-    updateCartInfo();
-
-  }
-
-}
-
-
-// ==============================
+// ===============================
 // BUBBLE TEA 0.7
-// ==============================
+// ===============================
 
 function addBubble07() {
-
   bubble07Count++;
   cartCount++;
   cartTotal += 1500;
 
-  updateQuantityControl(
-    "bubble07-count",
-    bubble07Count
-  );
+  updateQuantityControl("bubble07-count", bubble07Count);
+  updateCartInfo();
+}
 
+function removeBubble07() {
+  if (bubble07Count <= 0) return;
+
+  bubble07Count--;
+  cartCount--;
+  cartTotal -= 1500;
+
+  updateQuantityControl("bubble07-count", bubble07Count);
   updateCartInfo();
 }
 
 
-function removeBubble07() {
-
-  if (bubble07Count > 0) {
-
-    bubble07Count--;
-    cartCount--;
-    cartTotal -= 1500;
-
-    updateQuantityControl(
-      "bubble07-count",
-      bubble07Count
-    );
-
-    updateCartInfo();
-
-  }
-
-}
-
-
-// ==============================
+// ===============================
 // ЛИМОНАД 0.5
-// ==============================
+// ===============================
 
 function addLemonade05() {
-
   lemonade05Count++;
   cartCount++;
   cartTotal += 700;
 
-  updateQuantityControl(
-    "lemonade05-count",
-    lemonade05Count
-  );
+  updateQuantityControl("lemonade05-count", lemonade05Count);
+  updateCartInfo();
+}
 
+function removeLemonade05() {
+  if (lemonade05Count <= 0) return;
+
+  lemonade05Count--;
+  cartCount--;
+  cartTotal -= 700;
+
+  updateQuantityControl("lemonade05-count", lemonade05Count);
   updateCartInfo();
 }
 
 
-function removeLemonade05() {
-
-  if (lemonade05Count > 0) {
-
-    lemonade05Count--;
-    cartCount--;
-    cartTotal -= 700;
-
-    updateQuantityControl(
-      "lemonade05-count",
-      lemonade05Count
-    );
-
-    updateCartInfo();
-
-  }
-
-}
-
-
-// ==============================
+// ===============================
 // ЛИМОНАД 0.7
-// ==============================
+// ===============================
 
 function addLemonade07() {
-
   lemonade07Count++;
   cartCount++;
   cartTotal += 900;
 
-  updateQuantityControl(
-    "lemonade07-count",
-    lemonade07Count
-  );
+  updateQuantityControl("lemonade07-count", lemonade07Count);
+  updateCartInfo();
+}
 
+function removeLemonade07() {
+  if (lemonade07Count <= 0) return;
+
+  lemonade07Count--;
+  cartCount--;
+  cartTotal -= 900;
+
+  updateQuantityControl("lemonade07-count", lemonade07Count);
   updateCartInfo();
 }
 
 
-function removeLemonade07() {
+// ===============================
+// ТОВАРЫ ЗАКАЗА
+// ===============================
 
-  if (lemonade07Count > 0) {
+function getOrderItems() {
+  const items = [];
 
-    lemonade07Count--;
-    cartCount--;
-    cartTotal -= 900;
-
-    updateQuantityControl(
-      "lemonade07-count",
-      lemonade07Count
-    );
-
-    updateCartInfo();
-
+  if (philadelphiaCount > 0) {
+    items.push({
+      name: "Филадельфия",
+      quantity: philadelphiaCount,
+      price: 2790
+    });
   }
 
+  if (californiaCount > 0) {
+    items.push({
+      name: "Калифорния",
+      quantity: californiaCount,
+      price: 2490
+    });
+  }
+
+  if (burgerCount > 0) {
+    items.push({
+      name: "Чизбургер",
+      quantity: burgerCount,
+      price: 1650
+    });
+  }
+
+  if (alaskaCount > 0) {
+    items.push({
+      name: "Аляска",
+      quantity: alaskaCount,
+      price: 2390
+    });
+  }
+
+  if (bonitoCount > 0) {
+    items.push({
+      name: "Бонито",
+      quantity: bonitoCount,
+      price: 2190
+    });
+  }
+
+  if (bubble05Count > 0) {
+    items.push({
+      name: "Bubble Tea 0.5 L",
+      quantity: bubble05Count,
+      price: 1300
+    });
+  }
+
+  if (bubble07Count > 0) {
+    items.push({
+      name: "Bubble Tea 0.7 L",
+      quantity: bubble07Count,
+      price: 1500
+    });
+  }
+
+  if (lemonade05Count > 0) {
+    items.push({
+      name: "Лимонад 0.5 L",
+      quantity: lemonade05Count,
+      price: 700
+    });
+  }
+
+  if (lemonade07Count > 0) {
+    items.push({
+      name: "Лимонад 0.7 L",
+      quantity: lemonade07Count,
+      price: 900
+    });
+  }
+
+  return items;
 }
 
 
-// ==============================
-// КОРЗИНА
-// ==============================
+// ===============================
+// ОТКРЫТЬ КОРЗИНУ
+// ===============================
 
 function openCart() {
-
-  document.getElementById(
-    "cart-modal"
-  ).style.display = "flex";
-
-
-  let items = "";
-
-
-  if (philadelphiaCount > 0) {
-
-    items += `
-      <p>
-        Филадельфия × ${philadelphiaCount}
-        — ${philadelphiaCount * 2790} ₸
-      </p>
-    `;
-
-  }
-
-
-  if (californiaCount > 0) {
-
-    items += `
-      <p>
-        Калифорния × ${californiaCount}
-        — ${californiaCount * 2490} ₸
-      </p>
-    `;
-
-  }
-
-
-  if (burgerCount > 0) {
-
-    items += `
-      <p>
-        Чизбургер × ${burgerCount}
-        — ${burgerCount * 1650} ₸
-      </p>
-    `;
-
-  }
-
-
-  if (alaskaCount > 0) {
-
-    items += `
-      <p>
-        Аляска × ${alaskaCount}
-        — ${alaskaCount * 2390} ₸
-      </p>
-    `;
-
-  }
-
-
-  if (bonitoCount > 0) {
-
-    items += `
-      <p>
-        Бонито × ${bonitoCount}
-        — ${bonitoCount * 2190} ₸
-      </p>
-    `;
-
-  }
-
-
-  if (bubble05Count > 0) {
-
-    items += `
-      <p>
-        Bubble Tea 0.5 л × ${bubble05Count}
-        — ${bubble05Count * 1300} ₸
-      </p>
-    `;
-
-  }
-
-
-  if (bubble07Count > 0) {
-
-    items += `
-      <p>
-        Bubble Tea 0.7 л × ${bubble07Count}
-        — ${bubble07Count * 1500} ₸
-      </p>
-    `;
-
-  }
-
-
-  if (lemonade05Count > 0) {
-
-    items += `
-      <p>
-        Лимонад 0.5 л × ${lemonade05Count}
-        — ${lemonade05Count * 700} ₸
-      </p>
-    `;
-
-  }
-
-
-  if (lemonade07Count > 0) {
-
-    items += `
-      <p>
-        Лимонад 0.7 л × ${lemonade07Count}
-        — ${lemonade07Count * 900} ₸
-      </p>
-    `;
-
-  }
-
-
   if (cartCount === 0) {
-
-    items =
-      "<p>Корзина пуста</p>";
-
+    alert("Корзина пуста");
+    return;
   }
 
+  const modal = document.getElementById("cart-modal");
+  const cartItems = document.getElementById("cart-items");
+  const cartTotalElement = document.getElementById("cart-total");
 
-  document.getElementById(
-    "cart-items"
-  ).innerHTML = items;
+  const items = getOrderItems();
 
+  cartItems.innerHTML = "";
 
-  document.getElementById(
-    "cart-total"
-  ).textContent =
-    `Итого: ${cartTotal} ₸`;
+  items.forEach(item => {
+    const row = document.createElement("p");
 
+    row.textContent =
+      `${item.name} × ${item.quantity} — ${(item.price * item.quantity).toLocaleString("ru-RU")} ₸`;
+
+    cartItems.appendChild(row);
+  });
+
+  cartTotalElement.textContent =
+    `Итого: ${cartTotal.toLocaleString("ru-RU")} ₸`;
+
+  modal.style.display = "flex";
 }
 
 
 function closeCart() {
-
-  document.getElementById(
-    "cart-modal"
-  ).style.display = "none";
-
+  document.getElementById("cart-modal").style.display = "none";
 }
 
 
-// ==============================
-// ОФОРМЛЕНИЕ
-// ==============================
+// ===============================
+// CHECKOUT
+// ===============================
 
 function openCheckout() {
-
   if (cartCount === 0) {
-
     alert("Корзина пуста");
-
     return;
-
   }
 
+  closeCart();
 
-  document.getElementById(
-    "cart-modal"
-  ).style.display = "none";
-
-
-  document.getElementById(
-    "checkout-modal"
-  ).style.display = "flex";
-
+  document.getElementById("checkout-modal").style.display = "flex";
 }
 
 
 function closeCheckout() {
-
-  document.getElementById(
-    "checkout-modal"
-  ).style.display = "none";
-
+  document.getElementById("checkout-modal").style.display = "none";
 }
 
 
-// ==============================
-// ОТПРАВКА ЗАКАЗА
-// ==============================
-
-function sendOrder() {
-
-  let name =
-    document.getElementById(
-      "customer-name"
-    ).value.trim();
-
-
-  let phone =
-    document.getElementById(
-      "customer-phone"
-    ).value.trim();
-
-
-  let address =
-    document.getElementById(
-      "customer-address"
-    ).value.trim();
-
-
-  let tableNumber =
-    document.getElementById(
-      "table-number"
-    ).value.trim();
-
-
-  let payment =
-    document.querySelector(
-      'input[name="payment"]:checked'
-    ).value;
-
-
-  let orderType =
-    document.querySelector(
-      'input[name="orderType"]:checked'
-    ).value;
-
-
-  // Имя
-
-  if (name === "") {
-
-    alert("Заполните имя");
-
-    return;
-
-  }
-
-
-  // Стол
-
-  if (
-    orderType === "В заведении" &&
-    tableNumber === ""
-  ) {
-
-    alert("Укажите номер стола");
-
-    return;
-
-  }
-
-
-  // Доставка
-
-  if (
-    orderType === "Доставка" &&
-    (phone === "" || address === "")
-  ) {
-
-    alert(
-      "Заполните номер телефона и адрес"
-    );
-
-    return;
-
-  }
-
-
-  let order = "";
-
-
-  // Филадельфия
-
-  if (philadelphiaCount > 0) {
-
-    order +=
-      `Филадельфия × ${philadelphiaCount} — ${philadelphiaCount * 2790} ₸\n`;
-
-  }
-
-
-  // Калифорния
-
-  if (californiaCount > 0) {
-
-    order +=
-      `Калифорния × ${californiaCount} — ${californiaCount * 2490} ₸\n`;
-
-  }
-
-
-  // Чизбургер
-
-  if (burgerCount > 0) {
-
-    order +=
-      `Чизбургер × ${burgerCount} — ${burgerCount * 1650} ₸\n`;
-
-  }
-
-
-  // Аляска
-
-  if (alaskaCount > 0) {
-
-    order +=
-      `Аляска × ${alaskaCount} — ${alaskaCount * 2390} ₸\n`;
-
-  }
-
-
-  // Бонито
-
-  if (bonitoCount > 0) {
-
-    order +=
-      `Бонито × ${bonitoCount} — ${bonitoCount * 2190} ₸\n`;
-
-  }
-
-
-  // Bubble Tea 0.5
-
-  if (bubble05Count > 0) {
-
-    order +=
-      `Bubble Tea 0.5 л × ${bubble05Count} — ${bubble05Count * 1300} ₸\n`;
-
-  }
-
-
-  // Bubble Tea 0.7
-
-  if (bubble07Count > 0) {
-
-    order +=
-      `Bubble Tea 0.7 л × ${bubble07Count} — ${bubble07Count * 1500} ₸\n`;
-
-  }
-
-
-  // Лимонад 0.5
-
-  if (lemonade05Count > 0) {
-
-    order +=
-      `Лимонад 0.5 л × ${lemonade05Count} — ${lemonade05Count * 700} ₸\n`;
-
-  }
-
-
-  // Лимонад 0.7
-
-  if (lemonade07Count > 0) {
-
-    order +=
-      `Лимонад 0.7 л × ${lemonade07Count} — ${lemonade07Count * 900} ₸\n`;
-
-  }
-
-
-  let customerInfo = "";
-
-
-  if (orderType === "В заведении") {
-
-    customerInfo =
-`Тип заказа: В заведении
-Имя: ${name}
-Стол: ${tableNumber}`;
-
-  } else {
-
-    customerInfo =
-`Тип заказа: Доставка
-Имя: ${name}
-Телефон: ${phone}
-Адрес: ${address}`;
-
-  }
-
-
-  let message =
-`Новый заказ 🍔
-
-${order}
-Итого: ${cartTotal} ₸
-
-${customerInfo}
-
-Оплата: ${payment}`;
-
-
-  let whatsappNumber =
-    "77781577796";
-
-
-  let whatsappURL =
-    `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-
-
-  window.open(
-    whatsappURL,
-    "_blank"
+// ===============================
+// СОХРАНЕНИЕ В SUPABASE
+// ===============================
+
+async function saveOrderToSupabase(order) {
+  const response = await fetch(
+    `${SUPABASE_URL}/rest/v1/orders`,
+    {
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json",
+        "apikey": SUPABASE_ANON_KEY,
+        "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+        "Prefer": "return=representation"
+      },
+
+      body: JSON.stringify(order)
+    }
   );
 
+  if (!response.ok) {
+    const errorText = await response.text();
 
-  showSuccess();
+    console.error("Supabase error:", errorText);
 
+    throw new Error(errorText);
+  }
+
+  const data = await response.json();
+
+  return data[0];
 }
 
 
-// ==============================
-// ЗАКАЗ ПРИНЯТ
-// ==============================
+// ===============================
+// ОТПРАВИТЬ ЗАКАЗ
+// ===============================
 
-function showSuccess() {
+async function sendOrder() {
+  if (cartCount === 0) {
+    alert("Корзина пуста");
+    return;
+  }
 
-  document.getElementById(
-    "checkout-modal"
-  ).style.display = "none";
+  const name =
+    document.getElementById("customer-name").value.trim();
+
+  const phone =
+    document.getElementById("customer-phone").value.trim();
+
+  const address =
+    document.getElementById("customer-address").value.trim();
+
+  const tableNumber =
+    document.getElementById("table-number").value.trim();
+
+  const orderTypeElement =
+    document.querySelector('input[name="orderType"]:checked');
+
+  const paymentElement =
+    document.querySelector('input[name="payment"]:checked');
+
+  const orderType =
+    orderTypeElement ? orderTypeElement.value : "В заведении";
+
+  const paymentMethod =
+    paymentElement ? paymentElement.value : "Наличными";
 
 
-  document.getElementById(
-    "success-modal"
-  ).style.display = "flex";
+  // -------------------------------
+  // ПРОВЕРКА
+  // -------------------------------
+
+  if (!name) {
+    alert("Введите ваше имя");
+    return;
+  }
+
+  if (orderType === "В заведении" && !tableNumber) {
+    alert("Введите номер стола");
+    return;
+  }
+
+  if (orderType === "Доставка") {
+    if (!phone) {
+      alert("Введите номер телефона");
+      return;
+    }
+
+    if (!address) {
+      alert("Введите адрес доставки");
+      return;
+    }
+  }
 
 
-  document.getElementById(
-    "success-total"
-  ).textContent =
-    `Итого: ${cartTotal} ₸`;
+  const items = getOrderItems();
 
+
+  // -------------------------------
+  // НАЛИЧНЫЕ → SUPABASE
+  // -------------------------------
+
+  if (paymentMethod === "Наличными") {
+    const button =
+      document.querySelector("#checkout-modal .checkout-button");
+
+    const oldText = button.textContent;
+
+    button.disabled = true;
+    button.textContent = "Отправляем...";
+
+    try {
+      const savedOrder = await saveOrderToSupabase({
+        customer_name: name,
+
+        phone:
+          phone || null,
+
+        order_type:
+          orderType === "В заведении"
+            ? "dine_in"
+            : "delivery",
+
+        table_number:
+          orderType === "В заведении"
+            ? tableNumber
+            : null,
+
+        address:
+          orderType === "Доставка"
+            ? address
+            : null,
+
+        items: items,
+
+        total: cartTotal,
+
+        payment_method: "cash",
+
+        payment_status: "waiting",
+
+        order_status: "waiting_payment"
+      });
+
+
+      closeCheckout();
+
+      showSuccess(
+        savedOrder.id,
+        "cash"
+      );
+
+    } catch (error) {
+      console.error(error);
+
+      alert(
+        "Не удалось отправить заказ. Проверьте интернет и попробуйте ещё раз."
+      );
+
+    } finally {
+      button.disabled = false;
+      button.textContent = oldText;
+    }
+
+    return;
+  }
+
+
+  // -------------------------------
+  // KASPI — ПОКА СТАРЫЙ ВАРИАНТ
+  // -------------------------------
+
+  let message = "🍣 НОВЫЙ ЗАКАЗ BAI FOOD\n\n";
+
+  message += `Клиент: ${name}\n`;
+  message += `Тип заказа: ${orderType}\n`;
+
+  if (orderType === "В заведении") {
+    message += `Стол: ${tableNumber}\n`;
+  }
+
+  if (orderType === "Доставка") {
+    message += `Телефон: ${phone}\n`;
+    message += `Адрес: ${address}\n`;
+  }
+
+  message += "\n";
+
+  items.forEach(item => {
+    message +=
+      `${item.name} × ${item.quantity} — ${(item.price * item.quantity).toLocaleString("ru-RU")} ₸\n`;
+  });
+
+  message += `\nИТОГО: ${cartTotal.toLocaleString("ru-RU")} ₸\n`;
+  message += `Оплата: ${paymentMethod}`;
+
+  const whatsappNumber = "77781577796";
+
+  const whatsappURL =
+    `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+
+  window.open(whatsappURL, "_blank");
+
+  closeCheckout();
+
+  showSuccess(null, "kaspi");
 }
 
 
-// ==============================
-// НА ГЛАВНУЮ — БАРЛЫҒЫН RESET
-// ==============================
+// ===============================
+// УСПЕШНЫЙ ЗАКАЗ
+// ===============================
+
+function showSuccess(orderId = null, paymentType = "cash") {
+  const modal =
+    document.getElementById("success-modal");
+
+  const totalElement =
+    document.getElementById("success-total");
+
+  const title =
+    modal.querySelector("h2");
+
+  const paragraphs =
+    modal.querySelectorAll("p");
+
+
+  if (paymentType === "cash") {
+    title.textContent = orderId
+      ? `Заказ №${orderId} принят`
+      : "Заказ принят";
+
+    if (paragraphs[0]) {
+      paragraphs[0].textContent =
+        "Покажите номер заказа кассиру.";
+    }
+
+    if (paragraphs[1]) {
+      paragraphs[1].textContent =
+        "Заказ начнут готовить после оплаты наличными.";
+    }
+  } else {
+    title.textContent = "Заказ принят";
+
+    if (paragraphs[0]) {
+      paragraphs[0].textContent =
+        "Спасибо за заказ!";
+    }
+
+    if (paragraphs[1]) {
+      paragraphs[1].textContent =
+        "Мы скоро свяжемся с вами для подтверждения.";
+    }
+  }
+
+
+  totalElement.textContent =
+    `Итого: ${cartTotal.toLocaleString("ru-RU")} ₸`;
+
+  modal.style.display = "flex";
+}
+
+
+// ===============================
+// НА ГЛАВНУЮ / СБРОС
+// ===============================
 
 function closeSuccess() {
-
-  document.getElementById(
-    "success-modal"
-  ).style.display = "none";
-
-
-  // Барлық товар 0
+  document.getElementById("success-modal").style.display = "none";
 
   philadelphiaCount = 0;
   californiaCount = 0;
   burgerCount = 0;
-
   alaskaCount = 0;
   bonitoCount = 0;
 
   bubble05Count = 0;
   bubble07Count = 0;
-
   lemonade05Count = 0;
   lemonade07Count = 0;
-
-
-  // Корзина 0
 
   cartCount = 0;
   cartTotal = 0;
 
-
-  // Экрандағы сандарды да 0 қыламыз
 
   updateQuantityControl(
     "item-count",
     philadelphiaCount
   );
 
-
   updateQuantityControl(
     "california-count",
     californiaCount
   );
-
 
   updateQuantityControl(
     "burger-count",
     burgerCount
   );
 
-
   updateQuantityControl(
     "alaska-count",
     alaskaCount
   );
-
 
   updateQuantityControl(
     "bonito-count",
     bonitoCount
   );
 
-
   updateQuantityControl(
     "bubble05-count",
     bubble05Count
   );
-
 
   updateQuantityControl(
     "bubble07-count",
     bubble07Count
   );
 
-
   updateQuantityControl(
     "lemonade05-count",
     lemonade05Count
   );
-
 
   updateQuantityControl(
     "lemonade07-count",
@@ -947,226 +774,185 @@ function closeSuccess() {
   updateCartInfo();
 
 
-  // Форманы тазалау
+  const name =
+    document.getElementById("customer-name");
 
-  document.getElementById(
-    "customer-name"
-  ).value = "";
+  const phone =
+    document.getElementById("customer-phone");
 
+  const address =
+    document.getElementById("customer-address");
 
-  document.getElementById(
-    "customer-phone"
-  ).value = "";
-
-
-  document.getElementById(
-    "customer-address"
-  ).value = "";
+  const table =
+    document.getElementById("table-number");
 
 
-  document.getElementById(
-    "table-number"
-  ).value = "";
+  if (name) name.value = "";
+  if (phone) phone.value = "";
+  if (address) address.value = "";
+  if (table) table.value = "";
 
-
-  // Басты бетке апару
 
   window.scrollTo({
     top: 0,
     behavior: "smooth"
   });
-
 }
 
 
-// ==============================
-// САЙТ ЖҮКТЕЛГЕНДЕ
-// ==============================
+// ===============================
+// СТАРТ САЙТА
+// ===============================
 
-document.addEventListener(
-  "DOMContentLoaded",
-  function() {
+document.addEventListener("DOMContentLoaded", function () {
 
+  updateQuantityControl(
+    "item-count",
+    philadelphiaCount
+  );
 
-    // 0 болғанда − пен сан көрінбейді
+  updateQuantityControl(
+    "california-count",
+    californiaCount
+  );
 
-    updateQuantityControl(
-      "item-count",
-      philadelphiaCount
-    );
+  updateQuantityControl(
+    "burger-count",
+    burgerCount
+  );
 
+  updateQuantityControl(
+    "alaska-count",
+    alaskaCount
+  );
 
-    updateQuantityControl(
-      "california-count",
-      californiaCount
-    );
+  updateQuantityControl(
+    "bonito-count",
+    bonitoCount
+  );
 
+  updateQuantityControl(
+    "bubble05-count",
+    bubble05Count
+  );
 
-    updateQuantityControl(
-      "burger-count",
-      burgerCount
-    );
+  updateQuantityControl(
+    "bubble07-count",
+    bubble07Count
+  );
 
+  updateQuantityControl(
+    "lemonade05-count",
+    lemonade05Count
+  );
 
-    updateQuantityControl(
-      "alaska-count",
-      alaskaCount
-    );
+  updateQuantityControl(
+    "lemonade07-count",
+    lemonade07Count
+  );
 
-
-    updateQuantityControl(
-      "bonito-count",
-      bonitoCount
-    );
-
-
-    updateQuantityControl(
-      "bubble05-count",
-      bubble05Count
-    );
-
-
-    updateQuantityControl(
-      "bubble07-count",
-      bubble07Count
-    );
-
-
-    updateQuantityControl(
-      "lemonade05-count",
-      lemonade05Count
-    );
+  updateCartInfo();
 
 
-    updateQuantityControl(
-      "lemonade07-count",
-      lemonade07Count
-    );
+  // -------------------------------
+  // ТИП ЗАКАЗА
+  // -------------------------------
+
+  const orderTypes =
+    document.querySelectorAll('input[name="orderType"]');
+
+  const tableField =
+    document.getElementById("table-field");
+
+  const phoneInput =
+    document.getElementById("customer-phone");
+
+  const addressInput =
+    document.getElementById("customer-address");
 
 
-    updateCartInfo();
+  function updateOrderFields() {
+    const selected =
+      document.querySelector('input[name="orderType"]:checked');
+
+    if (!selected) return;
 
 
-    // ==============================
-    // KASPI
-    // ==============================
+    if (selected.value === "В заведении") {
 
-    document
-      .querySelectorAll(
-        'input[name="payment"]'
-      )
-      .forEach(function(radio) {
-
-        radio.addEventListener(
-          "change",
-          function() {
-
-            let kaspiPayment =
-              document.getElementById(
-                "kaspi-payment"
-              );
-
-
-            if (
-              this.value ===
-              "Kaspi перевод"
-            ) {
-
-              kaspiPayment.style.display =
-                "block";
-
-            } else {
-
-              kaspiPayment.style.display =
-                "none";
-
-            }
-
-          }
-        );
-
-      });
-
-
-    // ==============================
-    // В ЗАВЕДЕНИИ / ДОСТАВКА
-    // ==============================
-
-    let orderTypeRadios =
-      document.querySelectorAll(
-        'input[name="orderType"]'
-      );
-
-
-    let tableField =
-      document.getElementById(
-        "table-field"
-      );
-
-
-    let phoneField =
-      document.getElementById(
-        "customer-phone"
-      );
-
-
-    let addressField =
-      document.getElementById(
-        "customer-address"
-      );
-
-
-    function updateOrderFields() {
-
-      let selectedType =
-        document.querySelector(
-          'input[name="orderType"]:checked'
-        ).value;
-
-
-      if (
-        selectedType ===
-        "В заведении"
-      ) {
-
-        tableField.style.display =
-          "block";
-
-        phoneField.style.display =
-          "none";
-
-        addressField.style.display =
-          "none";
-
-      } else {
-
-        tableField.style.display =
-          "none";
-
-        phoneField.style.display =
-          "block";
-
-        addressField.style.display =
-          "block";
-
+      if (tableField) {
+        tableField.style.display = "block";
       }
 
+      if (phoneInput) {
+        phoneInput.style.display = "none";
+      }
+
+      if (addressInput) {
+        addressInput.style.display = "none";
+      }
+
+    } else {
+
+      if (tableField) {
+        tableField.style.display = "none";
+      }
+
+      if (phoneInput) {
+        phoneInput.style.display = "block";
+      }
+
+      if (addressInput) {
+        addressInput.style.display = "block";
+      }
     }
-
-
-    orderTypeRadios.forEach(
-      function(radio) {
-
-        radio.addEventListener(
-          "change",
-          updateOrderFields
-        );
-
-      }
-    );
-
-
-    updateOrderFields();
-
   }
-);
+
+
+  orderTypes.forEach(radio => {
+    radio.addEventListener(
+      "change",
+      updateOrderFields
+    );
+  });
+
+
+  updateOrderFields();
+
+
+  // -------------------------------
+  // ОПЛАТА
+  // -------------------------------
+
+  const paymentRadios =
+    document.querySelectorAll('input[name="payment"]');
+
+  const kaspiPayment =
+    document.getElementById("kaspi-payment");
+
+
+  function updatePayment() {
+    const selected =
+      document.querySelector('input[name="payment"]:checked');
+
+    if (!selected || !kaspiPayment) return;
+
+
+    if (selected.value === "Kaspi перевод") {
+      kaspiPayment.style.display = "block";
+    } else {
+      kaspiPayment.style.display = "none";
+    }
+  }
+
+
+  paymentRadios.forEach(radio => {
+    radio.addEventListener(
+      "change",
+      updatePayment
+    );
+  });
+
+
+  updatePayment();
+});
