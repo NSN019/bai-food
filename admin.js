@@ -1,126 +1,242 @@
+const SUPABASE_URL = "https://elzjmbwkgleuzpybiqdg.supabase.co";
+
+const SUPABASE_ANON_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJIUzI1NiIsInJlZiI6ImVsemptYndrZ2xldXpweWJpcWRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg1MDA1OTEsImV4cCI6MjEwNDA3NjU5MX0.JtcrSCdtV20YrMIyqYI66SjywOgGa4CVRqFRdpCujLg";
+
+
 let currentFilter = "waiting";
 let selectedOrderId = null;
+let orders = [];
+
+let accessToken =
+  localStorage.getItem("baiFoodAdminAccessToken");
+
+let refreshTimer = null;
 
 
 /*
 =================================
-DEMO ЗАКАЗДАР
-
-Кейін Supabase қосылған кезде
-осы жердің орнына база келеді.
+КАССИРДІҢ КІРУІ
 =================================
 */
 
-let orders = JSON.parse(
-  localStorage.getItem("baiFoodOrders")
-);
+async function loginAdmin() {
 
-if (!orders) {
+  const email = prompt(
+    "Кассирдің email адресін енгізіңіз:"
+  );
 
-  orders = [
-    {
-      id: 27,
-      table: 4,
-      customer: "Алихан",
+  if (!email) {
+    return false;
+  }
 
-      items: [
-        {
-          name: "Филадельфия",
-          quantity: 2,
-          price: 2790
+
+  const password = prompt(
+    "Құпия сөзді енгізіңіз:"
+  );
+
+  if (!password) {
+    return false;
+  }
+
+
+  try {
+
+    const response = await fetch(
+      `${SUPABASE_URL}/auth/v1/token?grant_type=password`,
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": SUPABASE_ANON_KEY
         },
 
-        {
-          name: "Bubble Tea 0.5",
-          quantity: 1,
-          price: 1300
-        }
-      ],
-
-      total: 6880,
-
-      payment: "Наличные",
-
-      status: "waiting",
-
-      time: "12:41"
-    },
+        body: JSON.stringify({
+          email: email,
+          password: password
+        })
+      }
+    );
 
 
-    {
-      id: 26,
-      table: 2,
-      customer: "Данияр",
+    if (!response.ok) {
 
-      items: [
-        {
-          name: "Калифорния",
-          quantity: 1,
-          price: 2490
-        },
+      const errorText =
+        await response.text();
 
-        {
-          name: "Лимонад 0.5",
-          quantity: 2,
-          price: 700
-        }
-      ],
+      console.error(
+        "Login error:",
+        errorText
+      );
 
-      total: 3890,
+      alert(
+        "Email немесе пароль дұрыс емес."
+      );
 
-      payment: "Наличные",
-
-      status: "paid",
-
-      time: "12:34"
-    },
-
-
-    {
-      id: 25,
-      table: 7,
-      customer: "Айдана",
-
-      items: [
-        {
-          name: "Аляска",
-          quantity: 1,
-          price: 2390
-        },
-
-        {
-          name: "Бонито",
-          quantity: 1,
-          price: 2190
-        }
-      ],
-
-      total: 4580,
-
-      payment: "Наличные",
-
-      status: "waiting",
-
-      time: "12:28"
+      return false;
     }
-  ];
 
-  saveOrders();
+
+    const data =
+      await response.json();
+
+
+    accessToken =
+      data.access_token;
+
+
+    localStorage.setItem(
+      "baiFoodAdminAccessToken",
+      accessToken
+    );
+
+
+    return true;
+
+  } catch (error) {
+
+    console.error(error);
+
+    alert(
+      "Supabase серверіне қосылу мүмкін болмады."
+    );
+
+    return false;
+  }
 }
 
 
 /*
 =================================
-САҚТАУ
+ЗАКАЗДАРДЫ SUPABASE-ТЕН АЛУ
 =================================
 */
 
-function saveOrders() {
+async function loadOrders() {
 
-  localStorage.setItem(
-    "baiFoodOrders",
-    JSON.stringify(orders)
-  );
+  if (!accessToken) {
+
+    const loggedIn =
+      await loginAdmin();
+
+    if (!loggedIn) {
+      return;
+    }
+  }
+
+
+  try {
+
+    const response = await fetch(
+      `${SUPABASE_URL}/rest/v1/orders?select=*&order=created_at.desc`,
+      {
+        headers: {
+          "apikey": SUPABASE_ANON_KEY,
+          "Authorization":
+            `Bearer ${accessToken}`
+        }
+      }
+    );
+
+
+    if (response.status === 401) {
+
+      localStorage.removeItem(
+        "baiFoodAdminAccessToken"
+      );
+
+      accessToken = null;
+
+      const loggedIn =
+        await loginAdmin();
+
+      if (loggedIn) {
+        return loadOrders();
+      }
+
+      return;
+    }
+
+
+    if (!response.ok) {
+
+      const errorText =
+        await response.text();
+
+      console.error(
+        "Supabase orders error:",
+        errorText
+      );
+
+      throw new Error(errorText);
+    }
+
+
+    const data =
+      await response.json();
+
+
+    orders =
+      data.map(function(order) {
+
+        return {
+
+          id: order.id,
+
+          table:
+            order.table_number ||
+            "—",
+
+          customer:
+            order.customer_name ||
+            "Без имени",
+
+          phone:
+            order.phone || "",
+
+          address:
+            order.address || "",
+
+          orderType:
+            order.order_type,
+
+          items:
+            Array.isArray(order.items)
+              ? order.items
+              : [],
+
+          total:
+            Number(order.total) || 0,
+
+          payment:
+            order.payment_method,
+
+          status:
+            order.payment_status === "paid"
+              ? "paid"
+              : "waiting",
+
+          time:
+            formatTime(
+              order.created_at
+            )
+        };
+
+      });
+
+
+    renderOrders();
+
+
+  } catch (error) {
+
+    console.error(error);
+
+    alert(
+      "Заказдарды жүктеу мүмкін болмады."
+    );
+  }
 }
 
 
@@ -133,43 +249,59 @@ function saveOrders() {
 function renderOrders() {
 
   const container =
-    document.getElementById("orders");
+    document.getElementById(
+      "orders"
+    );
 
   const empty =
-    document.getElementById("empty-state");
+    document.getElementById(
+      "empty-state"
+    );
 
 
   container.innerHTML = "";
 
 
   let filteredOrders =
-    orders.filter(function(order) {
+    orders.filter(
+      function(order) {
 
-      if (currentFilter === "all") {
-        return true;
+        if (
+          currentFilter === "all"
+        ) {
+          return true;
+        }
+
+        return (
+          order.status ===
+          currentFilter
+        );
       }
-
-      return order.status === currentFilter;
-    });
+    );
 
 
-  if (filteredOrders.length === 0) {
+  if (
+    filteredOrders.length === 0
+  ) {
 
-    empty.style.display = "block";
+    empty.style.display =
+      "block";
 
   } else {
 
-    empty.style.display = "none";
+    empty.style.display =
+      "none";
   }
 
 
-  filteredOrders
-    .slice()
-    .reverse()
-    .forEach(function(order) {
+  filteredOrders.forEach(
+    function(order) {
 
       const card =
-        document.createElement("article");
+        document.createElement(
+          "article"
+        );
+
 
       card.className =
         `order-card ${order.status}`;
@@ -178,37 +310,51 @@ function renderOrders() {
       let itemsHTML = "";
 
 
-      order.items.forEach(function(item) {
+      order.items.forEach(
+        function(item) {
 
-        itemsHTML += `
-          <div class="order-item">
+          const itemPrice =
+            Number(item.price) || 0;
 
-            <span>
-              ${item.name}
-              × ${item.quantity}
-            </span>
+          const itemQuantity =
+            Number(
+              item.quantity
+            ) || 0;
 
-            <strong>
-              ${formatMoney(
-                item.price *
-                item.quantity
-              )}
-            </strong>
 
-          </div>
-        `;
-      });
+          itemsHTML += `
+            <div class="order-item">
+
+              <span>
+                ${escapeHTML(item.name)}
+                × ${itemQuantity}
+              </span>
+
+              <strong>
+                ${formatMoney(
+                  itemPrice *
+                  itemQuantity
+                )}
+              </strong>
+
+            </div>
+          `;
+        }
+      );
 
 
       let statusText = "";
-
       let actionButton = "";
 
 
-      if (order.status === "waiting") {
+      if (
+        order.status ===
+        "waiting"
+      ) {
 
         statusText =
           "⏳ Ожидает оплаты";
+
 
         actionButton = `
           <button
@@ -224,11 +370,34 @@ function renderOrders() {
         statusText =
           "✓ Оплачено";
 
+
         actionButton = `
           <div class="paid-button">
             ✓ Оплачено наличными
           </div>
         `;
+      }
+
+
+      let locationText = "";
+
+      if (
+        order.orderType ===
+        "delivery"
+      ) {
+
+        locationText =
+          `🚚 ${escapeHTML(
+            order.address ||
+            "Доставка"
+          )}`;
+
+      } else {
+
+        locationText =
+          `🪑 Стол №${escapeHTML(
+            String(order.table)
+          )}`;
       }
 
 
@@ -263,20 +432,20 @@ function renderOrders() {
           <div class="customer-row">
 
             <span class="info-pill">
-              🪑 Стол №${order.table}
+              ${locationText}
             </span>
 
             <span class="info-pill">
-              👤 ${order.customer}
+              👤 ${escapeHTML(
+                order.customer
+              )}
             </span>
 
           </div>
 
 
           <div class="order-items">
-
             ${itemsHTML}
-
           </div>
 
 
@@ -287,7 +456,9 @@ function renderOrders() {
             </span>
 
             <strong>
-              ${formatMoney(order.total)}
+              ${formatMoney(
+                order.total
+              )}
             </strong>
 
           </div>
@@ -299,8 +470,11 @@ function renderOrders() {
       `;
 
 
-      container.appendChild(card);
-    });
+      container.appendChild(
+        card
+      );
+    }
+  );
 
 
   updateStats();
@@ -324,12 +498,14 @@ function setFilter(
 
   document
     .querySelectorAll(".tab")
-    .forEach(function(tab) {
+    .forEach(
+      function(tab) {
 
-      tab.classList.remove(
-        "active"
-      );
-    });
+        tab.classList.remove(
+          "active"
+        );
+      }
+    );
 
 
   button.classList.add(
@@ -347,18 +523,24 @@ function setFilter(
 =================================
 */
 
-function openConfirmModal(orderId) {
+function openConfirmModal(
+  orderId
+) {
 
   selectedOrderId =
     orderId;
 
 
   const order =
-    orders.find(function(item) {
+    orders.find(
+      function(item) {
 
-      return item.id ===
-        orderId;
-    });
+        return (
+          item.id ===
+          orderId
+        );
+      }
+    );
 
 
   if (!order) {
@@ -404,7 +586,7 @@ function closeConfirmModal() {
 =================================
 */
 
-function confirmCashPayment() {
+async function confirmCashPayment() {
 
   if (
     selectedOrderId === null
@@ -413,50 +595,79 @@ function confirmCashPayment() {
   }
 
 
-  const order =
-    orders.find(function(item) {
-
-      return item.id ===
-        selectedOrderId;
-    });
+  const orderId =
+    selectedOrderId;
 
 
-  if (!order) {
-    return;
+  try {
+
+    const response = await fetch(
+      `${SUPABASE_URL}/rest/v1/orders?id=eq.${orderId}`,
+      {
+        method: "PATCH",
+
+        headers: {
+          "Content-Type":
+            "application/json",
+
+          "apikey":
+            SUPABASE_ANON_KEY,
+
+          "Authorization":
+            `Bearer ${accessToken}`,
+
+          "Prefer":
+            "return=minimal"
+        },
+
+        body: JSON.stringify({
+          payment_status:
+            "paid",
+
+          order_status:
+            "paid",
+
+          paid_at:
+            new Date()
+              .toISOString()
+        })
+      }
+    );
+
+
+    if (!response.ok) {
+
+      const errorText =
+        await response.text();
+
+      console.error(
+        "Payment update error:",
+        errorText
+      );
+
+      throw new Error(
+        errorText
+      );
+    }
+
+
+    closeConfirmModal();
+
+
+    await loadOrders();
+
+
+    showToast();
+
+
+  } catch (error) {
+
+    console.error(error);
+
+    alert(
+      "Төлем статусын өзгерту мүмкін болмады."
+    );
   }
-
-
-  order.status =
-    "paid";
-
-  order.paidAt =
-    new Date().toISOString();
-
-
-  saveOrders();
-
-
-  closeConfirmModal();
-
-
-  renderOrders();
-
-
-  showToast();
-
-
-  /*
-  =================================
-  КЕЙІН ОСЫ ЖЕРДЕ:
-
-  1. Supabase-та статус өзгереді
-  2. Заказ кухняға жіберіледі
-  3. WhatsApp/кухня уведомление келеді
-
-  Төлем расталмайынша
-  кухняға жіберілмейді.
-  =================================
-  */
 }
 
 
@@ -469,30 +680,40 @@ function confirmCashPayment() {
 function updateStats() {
 
   const waiting =
-    orders.filter(function(order) {
+    orders.filter(
+      function(order) {
 
-      return order.status ===
-        "waiting";
-
-    }).length;
+        return (
+          order.status ===
+          "waiting"
+        );
+      }
+    ).length;
 
 
   const paid =
-    orders.filter(function(order) {
+    orders.filter(
+      function(order) {
 
-      return order.status ===
-        "paid";
-
-    });
+        return (
+          order.status ===
+          "paid"
+        );
+      }
+    );
 
 
   const revenue =
     paid.reduce(
-      function(sum, order) {
+      function(
+        sum,
+        order
+      ) {
 
-        return sum +
-          order.total;
-
+        return (
+          sum +
+          order.total
+        );
       },
       0
     );
@@ -527,11 +748,44 @@ function updateStats() {
 
 /*
 =================================
-АҚШАНЫ ФОРМАТТАУ
+УАҚЫТ
 =================================
 */
 
-function formatMoney(amount) {
+function formatTime(
+  dateString
+) {
+
+  if (!dateString) {
+    return "";
+  }
+
+
+  const date =
+    new Date(
+      dateString
+    );
+
+
+  return date.toLocaleTimeString(
+    "ru-RU",
+    {
+      hour: "2-digit",
+      minute: "2-digit"
+    }
+  );
+}
+
+
+/*
+=================================
+АҚША
+=================================
+*/
+
+function formatMoney(
+  amount
+) {
 
   return (
     new Intl.NumberFormat(
@@ -539,6 +793,40 @@ function formatMoney(amount) {
     ).format(amount) +
     " ₸"
   );
+}
+
+
+/*
+=================================
+ҚАУІПСІЗ TEXT
+=================================
+*/
+
+function escapeHTML(
+  value
+) {
+
+  return String(value)
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+    .replace(
+      /</g,
+      "&lt;"
+    )
+    .replace(
+      />/g,
+      "&gt;"
+    )
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+    .replace(
+      /'/g,
+      "&#039;"
+    );
 }
 
 
@@ -600,8 +888,68 @@ document
 
 /*
 =================================
+ОБНОВИТЬ БАТЫРМАСЫ
+=================================
+*/
+
+const refreshButton =
+  document.querySelector(
+    ".refresh-button"
+  );
+
+
+if (refreshButton) {
+
+  refreshButton.addEventListener(
+    "click",
+    function() {
+
+      loadOrders();
+    }
+  );
+}
+
+
+/*
+=================================
+АВТОМАТТЫ ОБНОВЛЕНИЕ
+=================================
+*/
+
+function startAutoRefresh() {
+
+  if (refreshTimer) {
+
+    clearInterval(
+      refreshTimer
+    );
+  }
+
+
+  refreshTimer =
+    setInterval(
+      function() {
+
+        loadOrders();
+
+      },
+      5000
+    );
+}
+
+
+/*
+=================================
 СТАРТ
 =================================
 */
 
-renderOrders();
+async function startAdmin() {
+
+  await loadOrders();
+
+  startAutoRefresh();
+}
+
+
+startAdmin();
