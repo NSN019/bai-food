@@ -547,9 +547,11 @@ async function sendOrder() {
 
   const items = getOrderItems();
 
+  const whatsappNumber = "77781577796";
+
 
   // -------------------------------
-  // НАЛИЧНЫЕ → SUPABASE
+  // НАЛИЧНЫЕ → SUPABASE + WHATSAPP
   // -------------------------------
 
   if (paymentMethod === "Наличными") {
@@ -595,6 +597,46 @@ async function sendOrder() {
       });
 
 
+      let message = `🆕 НОВЫЙ ЗАКАЗ №${savedOrder.id}\n\n`;
+
+      message += `👤 Клиент: ${name}\n`;
+      message += `📦 Тип заказа: ${orderType}\n`;
+
+      if (orderType === "В заведении") {
+        message += `🪑 Стол: ${tableNumber}\n`;
+      }
+
+      if (orderType === "Доставка") {
+        message += `📞 Телефон: ${phone}\n`;
+        message += `📍 Адрес: ${address}\n`;
+      }
+
+      message += "\n🍽 ЗАКАЗ:\n";
+
+      items.forEach(item => {
+        const itemTotal = item.price * item.quantity;
+
+        message +=
+          `${item.name} × ${item.quantity} — ${itemTotal.toLocaleString("ru-RU")} ₸\n`;
+      });
+
+      message +=
+        `\n💰 ИТОГО: ${cartTotal.toLocaleString("ru-RU")} ₸\n`;
+
+      if (orderType === "Доставка") {
+        message += "💵 Оплата: Наличными курьеру";
+      } else {
+        message += "💵 Оплата: Наличными";
+      }
+
+      const whatsappURL =
+        `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+
+      window.open(
+        whatsappURL,
+        "_blank"
+      );
+
       closeCheckout();
 
       showSuccess(
@@ -619,43 +661,62 @@ async function sendOrder() {
 
 
   // -------------------------------
-  // KASPI — ПОКА СТАРЫЙ ВАРИАНТ
+  // KASPI → WHATSAPP
   // -------------------------------
 
-  let message = "🍣 НОВЫЙ ЗАКАЗ BAI FOOD\n\n";
+  let message =
+    "🆕 НОВЫЙ ЗАКАЗ BAI FOOD\n\n";
 
-  message += `Клиент: ${name}\n`;
-  message += `Тип заказа: ${orderType}\n`;
+  message +=
+    `👤 Клиент: ${name}\n`;
+
+  message +=
+    `📦 Тип заказа: ${orderType}\n`;
 
   if (orderType === "В заведении") {
-    message += `Стол: ${tableNumber}\n`;
+    message +=
+      `🪑 Стол: ${tableNumber}\n`;
   }
 
   if (orderType === "Доставка") {
-    message += `Телефон: ${phone}\n`;
-    message += `Адрес: ${address}\n`;
+    message +=
+      `📞 Телефон: ${phone}\n`;
+
+    message +=
+      `📍 Адрес: ${address}\n`;
   }
 
-  message += "\n";
+  message +=
+    "\n🍽 ЗАКАЗ:\n";
 
   items.forEach(item => {
+    const itemTotal =
+      item.price * item.quantity;
+
     message +=
-      `${item.name} × ${item.quantity} — ${(item.price * item.quantity).toLocaleString("ru-RU")} ₸\n`;
+      `${item.name} × ${item.quantity} — ${itemTotal.toLocaleString("ru-RU")} ₸\n`;
   });
 
-  message += `\nИТОГО: ${cartTotal.toLocaleString("ru-RU")} ₸\n`;
-  message += `Оплата: ${paymentMethod}`;
+  message +=
+    `\n💰 ИТОГО: ${cartTotal.toLocaleString("ru-RU")} ₸\n`;
 
-  const whatsappNumber = "77781577796";
+  message +=
+    "💳 Оплата: Kaspi перевод";
 
   const whatsappURL =
     `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
 
-  window.open(whatsappURL, "_blank");
+  window.open(
+    whatsappURL,
+    "_blank"
+  );
 
   closeCheckout();
 
-  showSuccess(null, "kaspi");
+  showSuccess(
+    null,
+    "kaspi"
+  );
 }
 
 
