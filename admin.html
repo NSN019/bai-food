@@ -26,7 +26,59 @@
 
 <main class="container">
 
+  <!-- КҮНДІ ТАҢДАУ -->
+  <section class="date-panel">
+
+    <button
+      class="date-arrow"
+      onclick="changeDate(-1)"
+    >
+      ←
+    </button>
+
+    <div class="date-center">
+
+      <span class="date-caption">
+        Заказы за день
+      </span>
+
+      <strong id="selected-date-label">
+        Сегодня
+      </strong>
+
+      <input
+        id="order-date"
+        class="date-input"
+        type="date"
+        onchange="selectDate(this.value)"
+      >
+
+    </div>
+
+    <button
+      class="date-arrow"
+      onclick="changeDate(1)"
+    >
+      →
+    </button>
+
+    <button
+      class="today-button"
+      onclick="goToday()"
+    >
+      Сегодня
+    </button>
+
+  </section>
+
+
+  <!-- СТАТИСТИКА -->
   <section class="stats">
+
+    <div class="stat-card">
+      <span>Всего заказов</span>
+      <strong id="orders-count">0</strong>
+    </div>
 
     <div class="stat-card">
       <span>Ожидают оплаты</span>
@@ -46,23 +98,25 @@
   </section>
 
 
+  <!-- ЗАКАЗДАР -->
   <section class="toolbar">
 
     <div>
       <h2>Заказы</h2>
-      <p>Заказы обновляются автоматически</p>
+
+      <p>
+        Новые заказы появляются автоматически
+      </p>
     </div>
 
-    <button
-      class="refresh-button"
-      onclick="renderOrders()"
-    >
+    <button class="refresh-button">
       ↻ Обновить
     </button>
 
   </section>
 
 
+  <!-- ФИЛЬТР -->
   <div class="tabs">
 
     <button
@@ -89,6 +143,7 @@
   </div>
 
 
+  <!-- ЗАКАЗ КАРТОЧКАЛАРЫ -->
   <section
     id="orders"
     class="orders"
@@ -96,18 +151,28 @@
   </section>
 
 
+  <!-- ЗАКАЗ ЖОҚ БОЛСА -->
   <div
     id="empty-state"
     class="empty-state"
   >
+
     <div>🍣</div>
-    <h3>Нет заказов</h3>
-    <p>Новые заказы появятся здесь</p>
+
+    <h3>
+      Нет заказов
+    </h3>
+
+    <p>
+      За выбранный день заказов пока нет
+    </p>
+
   </div>
 
 </main>
 
 
+<!-- ТӨЛЕМДІ РАСТАУ -->
 <div
   id="confirm-modal"
   class="modal"
@@ -115,17 +180,21 @@
 
   <div class="modal-box">
 
-    <div class="modal-icon">
+    <div
+      id="confirm-icon"
+      class="modal-icon"
+    >
       💵
     </div>
 
-    <h2>
+    <h2 id="confirm-title">
       Подтвердить оплату?
     </h2>
 
     <p id="confirm-text">
       Заказ
     </p>
+
 
     <div class="modal-actions">
 
@@ -137,8 +206,9 @@
       </button>
 
       <button
+        id="confirm-payment-button"
         class="confirm-button"
-        onclick="confirmCashPayment()"
+        onclick="confirmPayment()"
       >
         ✓ Оплачено
       </button>
@@ -150,6 +220,7 @@
 </div>
 
 
+<!-- ХАБАРЛАМА -->
 <div
   id="toast"
   class="toast"

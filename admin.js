@@ -1,39 +1,254 @@
-const SUPABASE_URL = "https://elzjmbwkgleuzpybiqdg.supabase.co";
+const SUPABASE_URL =
+  "https://elzjmbwkgleuzpybiqdg.supabase.co";
 
 const SUPABASE_ANON_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVsemptYndrZ2xldXpweWJpcWRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg1MDA1OTEsImV4cCI6MjEwNDA3NjU5MX0.JtcrSCdtV20YrMIyqYI66SjywOgGa4CVRqFRdpCujLg";
 
 
 let currentFilter = "waiting";
+
 let selectedOrderId = null;
+
 let orders = [];
 
 let accessToken =
-  localStorage.getItem("baiFoodAdminAccessToken");
+  localStorage.getItem(
+    "baiFoodAdminAccessToken"
+  );
 
 let refreshTimer = null;
 
 
-/*
-=================================
-КАССИРДІҢ КІРУІ
-=================================
-*/
+// Бастапқыда бүгінгі күн таңдалады
+let selectedDate =
+  getLocalDateKey(new Date());
+
+
+// =================================
+// КҮНДІ ДҰРЫС АЛУ
+// =================================
+
+function getLocalDateKey(date) {
+
+  const year =
+    date.getFullYear();
+
+  const month =
+    String(
+      date.getMonth() + 1
+    ).padStart(2, "0");
+
+  const day =
+    String(
+      date.getDate()
+    ).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
+
+// =================================
+// ЗАКАЗДЫҢ КҮНІ
+// =================================
+
+function orderDateKey(dateString) {
+
+  return getLocalDateKey(
+    new Date(dateString)
+  );
+
+}
+
+
+// =================================
+// КҮНДІ ӘДЕМІ КӨРСЕТУ
+// =================================
+
+function formatSelectedDate(dateKey) {
+
+  const [
+    year,
+    month,
+    day
+  ] =
+    dateKey
+      .split("-")
+      .map(Number);
+
+  const date =
+    new Date(
+      year,
+      month - 1,
+      day
+    );
+
+  return date.toLocaleDateString(
+    "ru-RU",
+    {
+      day: "numeric",
+      month: "long",
+      year: "numeric"
+    }
+  );
+
+}
+
+
+// =================================
+// DATE UI
+// =================================
+
+function updateDateUI() {
+
+  const input =
+    document.getElementById(
+      "order-date"
+    );
+
+  const label =
+    document.getElementById(
+      "selected-date-label"
+    );
+
+
+  if (input) {
+    input.value =
+      selectedDate;
+  }
+
+
+  if (label) {
+
+    const today =
+      getLocalDateKey(
+        new Date()
+      );
+
+    if (
+      selectedDate === today
+    ) {
+
+      label.textContent =
+        `Сегодня • ${formatSelectedDate(
+          selectedDate
+        )}`;
+
+    } else {
+
+      label.textContent =
+        formatSelectedDate(
+          selectedDate
+        );
+
+    }
+
+  }
+
+}
+
+
+// =================================
+// ← → КҮН АУЫСТЫРУ
+// =================================
+
+function changeDate(days) {
+
+  const [
+    year,
+    month,
+    day
+  ] =
+    selectedDate
+      .split("-")
+      .map(Number);
+
+
+  const date =
+    new Date(
+      year,
+      month - 1,
+      day
+    );
+
+
+  date.setDate(
+    date.getDate() + days
+  );
+
+
+  selectedDate =
+    getLocalDateKey(date);
+
+
+  updateDateUI();
+
+  renderOrders();
+
+}
+
+
+// =================================
+// КАЛЕНДАРЬДАН КҮН ТАҢДАУ
+// =================================
+
+function selectDate(value) {
+
+  if (!value) {
+    return;
+  }
+
+
+  selectedDate = value;
+
+
+  updateDateUI();
+
+  renderOrders();
+
+}
+
+
+// =================================
+// БҮГІНГІ КҮНГЕ ҚАЙТУ
+// =================================
+
+function goToday() {
+
+  selectedDate =
+    getLocalDateKey(
+      new Date()
+    );
+
+
+  updateDateUI();
+
+  renderOrders();
+
+}
+
+
+// =================================
+// КАССИРДІҢ КІРУІ
+// =================================
 
 async function loginAdmin() {
 
-  const email = prompt(
-    "Кассирдің email адресін енгізіңіз:"
-  );
+  const email =
+    prompt(
+      "Кассирдің email адресін енгізіңіз:"
+    );
+
 
   if (!email) {
     return false;
   }
 
 
-  const password = prompt(
-    "Құпия сөзді енгізіңіз:"
-  );
+  const password =
+    prompt(
+      "Құпия сөзді енгізіңіз:"
+    );
+
 
   if (!password) {
     return false;
@@ -42,37 +257,41 @@ async function loginAdmin() {
 
   try {
 
-    const response = await fetch(
-      `${SUPABASE_URL}/auth/v1/token?grant_type=password`,
-      {
-        method: "POST",
+    const response =
+      await fetch(
+        `${SUPABASE_URL}/auth/v1/token?grant_type=password`,
+        {
+          method: "POST",
 
-        headers: {
-          "Content-Type": "application/json",
-          "apikey": SUPABASE_ANON_KEY
-        },
+          headers: {
+            "Content-Type":
+              "application/json",
 
-        body: JSON.stringify({
-          email: email,
-          password: password
-        })
-      }
-    );
+            "apikey":
+              SUPABASE_ANON_KEY
+          },
+
+          body:
+            JSON.stringify({
+              email: email,
+              password: password
+            })
+        }
+      );
 
 
     if (!response.ok) {
 
-      const errorText =
-        await response.text();
-
       console.error(
         "Login error:",
-        errorText
+        await response.text()
       );
+
 
       alert(
         "Email немесе пароль дұрыс емес."
       );
+
 
       return false;
     }
@@ -98,20 +317,21 @@ async function loginAdmin() {
 
     console.error(error);
 
+
     alert(
       "Supabase серверіне қосылу мүмкін болмады."
     );
 
+
     return false;
   }
+
 }
 
 
-/*
-=================================
-ЗАКАЗДАРДЫ SUPABASE-ТЕН АЛУ
-=================================
-*/
+// =================================
+// SUPABASE-ТЕН ЗАКАЗДАРДЫ АЛУ
+// =================================
 
 async function loadOrders() {
 
@@ -120,40 +340,54 @@ async function loadOrders() {
     const loggedIn =
       await loginAdmin();
 
+
     if (!loggedIn) {
       return;
     }
+
   }
 
 
   try {
 
-    const response = await fetch(
-      `${SUPABASE_URL}/rest/v1/orders?select=*&order=created_at.desc`,
-      {
-        headers: {
-          "apikey": SUPABASE_ANON_KEY,
-          "Authorization":
-            `Bearer ${accessToken}`
+    const response =
+      await fetch(
+        `${SUPABASE_URL}/rest/v1/orders?select=*&order=created_at.desc`,
+        {
+          headers: {
+
+            "apikey":
+              SUPABASE_ANON_KEY,
+
+            "Authorization":
+              `Bearer ${accessToken}`
+
+          }
         }
-      }
-    );
+      );
 
 
-    if (response.status === 401) {
+    // Token ескірсе
+    if (
+      response.status === 401
+    ) {
 
       localStorage.removeItem(
         "baiFoodAdminAccessToken"
       );
 
+
       accessToken = null;
+
 
       const loggedIn =
         await loginAdmin();
 
+
       if (loggedIn) {
         return loadOrders();
       }
+
 
       return;
     }
@@ -164,12 +398,16 @@ async function loadOrders() {
       const errorText =
         await response.text();
 
+
       console.error(
         "Supabase orders error:",
         errorText
       );
 
-      throw new Error(errorText);
+
+      throw new Error(
+        errorText
+      );
     }
 
 
@@ -178,73 +416,110 @@ async function loadOrders() {
 
 
     orders =
-      data.map(function(order) {
+      data.map(
+        function(order) {
 
-        return {
+          return {
 
-          id: order.id,
+            id:
+              order.id,
 
-          table:
-            order.table_number ||
-            "—",
+            table:
+              order.table_number ||
+              "—",
 
-          customer:
-            order.customer_name ||
-            "Без имени",
+            customer:
+              order.customer_name ||
+              "Без имени",
 
-          phone:
-            order.phone || "",
+            phone:
+              order.phone ||
+              "",
 
-          address:
-            order.address || "",
+            address:
+              order.address ||
+              "",
 
-          orderType:
-            order.order_type,
+            orderType:
+              order.order_type,
 
-          items:
-            Array.isArray(order.items)
-              ? order.items
-              : [],
+            items:
+              Array.isArray(
+                order.items
+              )
+                ? order.items
+                : [],
 
-          total:
-            Number(order.total) || 0,
+            total:
+              Number(
+                order.total
+              ) || 0,
 
-          payment:
-            order.payment_method,
+            payment:
+              order.payment_method ||
+              "cash",
 
-          status:
-            order.payment_status === "paid"
-              ? "paid"
-              : "waiting",
+            status:
+              order.payment_status ===
+              "paid"
+                ? "paid"
+                : "waiting",
 
-          time:
-            formatTime(
-              order.created_at
-            )
-        };
+            createdAt:
+              order.created_at,
 
-      });
+            time:
+              formatTime(
+                order.created_at
+              )
+
+          };
+
+        }
+      );
 
 
     renderOrders();
-
 
   } catch (error) {
 
     console.error(error);
 
+
     alert(
       "Заказдарды жүктеу мүмкін болмады."
     );
+
   }
+
 }
 
 
-/*
-=================================
-ЗАКАЗДАРДЫ КӨРСЕТУ
-=================================
-*/
+// =================================
+// ТАҢДАЛҒАН КҮННІҢ ЗАКАЗДАРЫ
+// =================================
+
+function getOrdersForSelectedDate() {
+
+  return orders.filter(
+    function(order) {
+
+      return (
+        orderDateKey(
+          order.createdAt
+        ) ===
+        selectedDate
+      );
+
+    }
+  );
+
+}
+
+
+// =================================
+// ЗАКАЗДАРДЫ ЭКРАНҒА ШЫҒАРУ
+// =================================
 
 function renderOrders() {
 
@@ -253,17 +528,30 @@ function renderOrders() {
       "orders"
     );
 
+
   const empty =
     document.getElementById(
       "empty-state"
     );
 
 
+  if (
+    !container ||
+    !empty
+  ) {
+    return;
+  }
+
+
   container.innerHTML = "";
 
 
-  let filteredOrders =
-    orders.filter(
+  const dayOrders =
+    getOrdersForSelectedDate();
+
+
+  const filteredOrders =
+    dayOrders.filter(
       function(order) {
 
         if (
@@ -272,26 +560,20 @@ function renderOrders() {
           return true;
         }
 
+
         return (
           order.status ===
           currentFilter
         );
+
       }
     );
 
 
-  if (
+  empty.style.display =
     filteredOrders.length === 0
-  ) {
-
-    empty.style.display =
-      "block";
-
-  } else {
-
-    empty.style.display =
-      "none";
-  }
+      ? "block"
+      : "none";
 
 
   filteredOrders.forEach(
@@ -314,7 +596,10 @@ function renderOrders() {
         function(item) {
 
           const itemPrice =
-            Number(item.price) || 0;
+            Number(
+              item.price
+            ) || 0;
+
 
           const itemQuantity =
             Number(
@@ -339,52 +624,149 @@ function renderOrders() {
 
             </div>
           `;
+
         }
       );
 
 
+      const isKaspi =
+        order.payment ===
+        "kaspi";
+
+
+      const isDelivery =
+        order.orderType ===
+        "delivery";
+
+
       let statusText = "";
+
       let actionButton = "";
 
+
+      // ===========================
+      // ТӨЛЕНБЕГЕН
+      // ===========================
 
       if (
         order.status ===
         "waiting"
       ) {
 
-        statusText =
-          "⏳ Ожидает оплаты";
+        if (isKaspi) {
+
+          statusText =
+            "⏳ Проверить Kaspi";
+
+        } else if (
+          isDelivery
+        ) {
+
+          statusText =
+            "🚚 Оплата курьеру";
+
+        } else {
+
+          statusText =
+            "⏳ Ожидает оплаты";
+
+        }
+
+
+        let buttonText = "";
+
+
+        if (isKaspi) {
+
+          buttonText =
+            "💳 ПОДТВЕРДИТЬ KASPI";
+
+        } else if (
+          isDelivery
+        ) {
+
+          buttonText =
+            "💵 КУРЬЕР ПОЛУЧИЛ ОПЛАТУ";
+
+        } else {
+
+          buttonText =
+            "💵 ПОДТВЕРДИТЬ ОПЛАТУ";
+
+        }
 
 
         actionButton = `
           <button
-            class="pay-button"
-            onclick="openConfirmModal(${order.id})"
+            class="
+              pay-button
+              ${isKaspi
+                ? "kaspi-button"
+                : ""}
+            "
+            onclick="
+              openConfirmModal(
+                ${order.id}
+              )
+            "
           >
-            💵 ПОДТВЕРДИТЬ ОПЛАТУ
+            ${buttonText}
           </button>
         `;
 
-      } else {
+      }
+
+
+      // ===========================
+      // ТӨЛЕНГЕН
+      // ===========================
+
+      else {
 
         statusText =
           "✓ Оплачено";
 
 
+        let paidText = "";
+
+
+        if (isKaspi) {
+
+          paidText =
+            "✓ Оплачено через Kaspi";
+
+        } else if (
+          isDelivery
+        ) {
+
+          paidText =
+            "✓ Оплачено курьеру";
+
+        } else {
+
+          paidText =
+            "✓ Оплачено наличными";
+
+        }
+
+
         actionButton = `
           <div class="paid-button">
-            ✓ Оплачено наличными
+            ${paidText}
           </div>
         `;
+
       }
 
 
+      // ===========================
+      // СТОЛ / ДОСТАВКА
+      // ===========================
+
       let locationText = "";
 
-      if (
-        order.orderType ===
-        "delivery"
-      ) {
+
+      if (isDelivery) {
 
         locationText =
           `🚚 ${escapeHTML(
@@ -396,10 +778,63 @@ function renderOrders() {
 
         locationText =
           `🪑 Стол №${escapeHTML(
-            String(order.table)
+            String(
+              order.table
+            )
           )}`;
+
       }
 
+
+      // ===========================
+      // ТӨЛЕМ ТҮРІ
+      // ===========================
+
+      let paymentText = "";
+
+
+      if (isKaspi) {
+
+        paymentText =
+          "💳 Kaspi перевод";
+
+      } else if (
+        isDelivery
+      ) {
+
+        paymentText =
+          "💵 Наличными курьеру";
+
+      } else {
+
+        paymentText =
+          "💵 Наличными";
+
+      }
+
+
+      // ===========================
+      // ТЕЛЕФОН
+      // ===========================
+
+      const phoneHTML =
+        isDelivery &&
+        order.phone
+
+          ? `
+            <span class="info-pill">
+              📞 ${escapeHTML(
+                order.phone
+              )}
+            </span>
+          `
+
+          : "";
+
+
+      // ===========================
+      // КАРТОЧКА
+      // ===========================
 
       card.innerHTML = `
 
@@ -419,7 +854,10 @@ function renderOrders() {
 
 
           <span
-            class="status-badge ${order.status}"
+            class="
+              status-badge
+              ${order.status}
+            "
           >
             ${statusText}
           </span>
@@ -435,11 +873,28 @@ function renderOrders() {
               ${locationText}
             </span>
 
+
             <span class="info-pill">
               👤 ${escapeHTML(
                 order.customer
               )}
             </span>
+
+
+            <span
+              class="
+                info-pill
+                payment-pill
+                ${isKaspi
+                  ? "kaspi"
+                  : ""}
+              "
+            >
+              ${paymentText}
+            </span>
+
+
+            ${phoneHTML}
 
           </div>
 
@@ -473,19 +928,19 @@ function renderOrders() {
       container.appendChild(
         card
       );
+
     }
   );
 
 
   updateStats();
+
 }
 
 
-/*
-=================================
-ФИЛЬТР
-=================================
-*/
+// =================================
+// ФИЛЬТР
+// =================================
 
 function setFilter(
   filter,
@@ -497,13 +952,16 @@ function setFilter(
 
 
   document
-    .querySelectorAll(".tab")
+    .querySelectorAll(
+      ".tab"
+    )
     .forEach(
       function(tab) {
 
         tab.classList.remove(
           "active"
         );
+
       }
     );
 
@@ -514,14 +972,13 @@ function setFilter(
 
 
   renderOrders();
+
 }
 
 
-/*
-=================================
-ОПЛАТА MODAL
-=================================
-*/
+// =================================
+// ОПЛАТА MODAL
+// =================================
 
 function openConfirmModal(
   orderId
@@ -539,6 +996,7 @@ function openConfirmModal(
           item.id ===
           orderId
         );
+
       }
     );
 
@@ -548,48 +1006,160 @@ function openConfirmModal(
   }
 
 
-  document
-    .getElementById(
-      "confirm-text"
-    )
-    .textContent =
-      `Заказ №${order.id} • Стол №${order.table} • ${formatMoney(order.total)}`;
+  const isKaspi =
+    order.payment ===
+    "kaspi";
 
 
-  document
-    .getElementById(
-      "confirm-modal"
-    )
-    .style.display =
-      "flex";
+  const isDelivery =
+    order.orderType ===
+    "delivery";
+
+
+  const icon =
+    document.getElementById(
+      "confirm-icon"
+    );
+
+
+  const title =
+    document.getElementById(
+      "confirm-title"
+    );
+
+
+  const button =
+    document.getElementById(
+      "confirm-payment-button"
+    );
+
+
+  if (icon) {
+
+    icon.textContent =
+      isKaspi
+        ? "💳"
+        : "💵";
+
+  }
+
+
+  if (title) {
+
+    if (isKaspi) {
+
+      title.textContent =
+        "Подтвердить Kaspi?";
+
+    } else if (
+      isDelivery
+    ) {
+
+      title.textContent =
+        "Курьер получил оплату?";
+
+    } else {
+
+      title.textContent =
+        "Подтвердить оплату?";
+
+    }
+
+  }
+
+
+  if (button) {
+
+    button.textContent =
+      isKaspi
+        ? "✓ Kaspi проверен"
+        : "✓ Оплачено";
+
+  }
+
+
+  let placeText = "";
+
+
+  if (isDelivery) {
+
+    placeText =
+      "Доставка";
+
+  } else {
+
+    placeText =
+      `Стол №${order.table}`;
+
+  }
+
+
+  let paymentText = "";
+
+
+  if (isKaspi) {
+
+    paymentText =
+      "Kaspi перевод";
+
+  } else if (
+    isDelivery
+  ) {
+
+    paymentText =
+      "Наличными курьеру";
+
+  } else {
+
+    paymentText =
+      "Наличными";
+
+  }
+
+
+  document.getElementById(
+    "confirm-text"
+  ).textContent =
+    `Заказ №${order.id} • ${placeText} • ${paymentText} • ${formatMoney(
+      order.total
+    )}`;
+
+
+  document.getElementById(
+    "confirm-modal"
+  ).style.display =
+    "flex";
+
 }
 
 
+// =================================
+// MODAL ЖАБУ
+// =================================
+
 function closeConfirmModal() {
 
-  document
-    .getElementById(
-      "confirm-modal"
-    )
-    .style.display =
-      "none";
+  document.getElementById(
+    "confirm-modal"
+  ).style.display =
+    "none";
 
 
   selectedOrderId =
     null;
+
 }
 
 
-/*
-=================================
-НАЛИЧКА ТӨЛЕМІН РАСТАУ
-=================================
-*/
+// =================================
+// ТӨЛЕМДІ РАСТАУ
+// =================================
 
-async function confirmCashPayment() {
+async function confirmPayment() {
 
   if (
-    selectedOrderId === null
+    selectedOrderId ===
+    null
   ) {
     return;
   }
@@ -601,38 +1171,45 @@ async function confirmCashPayment() {
 
   try {
 
-    const response = await fetch(
-      `${SUPABASE_URL}/rest/v1/orders?id=eq.${orderId}`,
-      {
-        method: "PATCH",
+    const response =
+      await fetch(
+        `${SUPABASE_URL}/rest/v1/orders?id=eq.${orderId}`,
+        {
+          method: "PATCH",
 
-        headers: {
-          "Content-Type":
-            "application/json",
+          headers: {
 
-          "apikey":
-            SUPABASE_ANON_KEY,
+            "Content-Type":
+              "application/json",
 
-          "Authorization":
-            `Bearer ${accessToken}`,
+            "apikey":
+              SUPABASE_ANON_KEY,
 
-          "Prefer":
-            "return=minimal"
-        },
+            "Authorization":
+              `Bearer ${accessToken}`,
 
-        body: JSON.stringify({
-          payment_status:
-            "paid",
+            "Prefer":
+              "return=minimal"
 
-          order_status:
-            "paid",
+          },
 
-          paid_at:
-            new Date()
-              .toISOString()
-        })
-      }
-    );
+          body:
+            JSON.stringify({
+
+              payment_status:
+                "paid",
+
+              order_status:
+                "paid",
+
+              paid_at:
+                new Date()
+                  .toISOString()
+
+            })
+
+        }
+      );
 
 
     if (!response.ok) {
@@ -640,10 +1217,12 @@ async function confirmCashPayment() {
       const errorText =
         await response.text();
 
+
       console.error(
         "Payment update error:",
         errorText
       );
+
 
       throw new Error(
         errorText
@@ -659,46 +1238,60 @@ async function confirmCashPayment() {
 
     showToast();
 
-
   } catch (error) {
 
     console.error(error);
 
+
     alert(
       "Төлем статусын өзгерту мүмкін болмады."
     );
+
   }
+
 }
 
 
-/*
-=================================
-СТАТИСТИКА
-=================================
-*/
+// Ескі функциямен де үйлесімді
+function confirmCashPayment() {
+
+  return confirmPayment();
+
+}
+
+
+// =================================
+// КҮНДІК СТАТИСТИКА
+// =================================
 
 function updateStats() {
 
+  const dayOrders =
+    getOrdersForSelectedDate();
+
+
   const waiting =
-    orders.filter(
+    dayOrders.filter(
       function(order) {
 
         return (
           order.status ===
           "waiting"
         );
+
       }
-    ).length;
+    );
 
 
   const paid =
-    orders.filter(
+    dayOrders.filter(
       function(order) {
 
         return (
           order.status ===
           "paid"
         );
+
       }
     );
 
@@ -714,43 +1307,43 @@ function updateStats() {
           sum +
           order.total
         );
+
       },
       0
     );
 
 
-  document
-    .getElementById(
-      "waiting-count"
-    )
-    .textContent =
-      waiting;
+  document.getElementById(
+    "orders-count"
+  ).textContent =
+    dayOrders.length;
 
 
-  document
-    .getElementById(
-      "paid-count"
-    )
-    .textContent =
-      paid.length;
+  document.getElementById(
+    "waiting-count"
+  ).textContent =
+    waiting.length;
 
 
-  document
-    .getElementById(
-      "revenue"
-    )
-    .textContent =
-      formatMoney(
-        revenue
-      );
+  document.getElementById(
+    "paid-count"
+  ).textContent =
+    paid.length;
+
+
+  document.getElementById(
+    "revenue"
+  ).textContent =
+    formatMoney(
+      revenue
+    );
+
 }
 
 
-/*
-=================================
-УАҚЫТ
-=================================
-*/
+// =================================
+// УАҚЫТ
+// =================================
 
 function formatTime(
   dateString
@@ -761,27 +1354,22 @@ function formatTime(
   }
 
 
-  const date =
-    new Date(
-      dateString
-    );
-
-
-  return date.toLocaleTimeString(
+  return new Date(
+    dateString
+  ).toLocaleTimeString(
     "ru-RU",
     {
       hour: "2-digit",
       minute: "2-digit"
     }
   );
+
 }
 
 
-/*
-=================================
-АҚША
-=================================
-*/
+// =================================
+// АҚША
+// =================================
 
 function formatMoney(
   amount
@@ -793,48 +1381,51 @@ function formatMoney(
     ).format(amount) +
     " ₸"
   );
+
 }
 
 
-/*
-=================================
-ҚАУІПСІЗ TEXT
-=================================
-*/
+// =================================
+// TEXT ҚАУІПСІЗДІГІ
+// =================================
 
 function escapeHTML(
   value
 ) {
 
   return String(value)
+
     .replace(
       /&/g,
       "&amp;"
     )
+
     .replace(
       /</g,
       "&lt;"
     )
+
     .replace(
       />/g,
       "&gt;"
     )
+
     .replace(
       /"/g,
       "&quot;"
     )
+
     .replace(
       /'/g,
       "&#039;"
     );
+
 }
 
 
-/*
-=================================
-TOAST
-=================================
-*/
+// =================================
+// TOAST
+// =================================
 
 function showToast() {
 
@@ -859,14 +1450,13 @@ function showToast() {
     },
     2200
   );
+
 }
 
 
-/*
-=================================
-MODAL СЫРТЫН БАСҚАНДА ЖАБУ
-=================================
-*/
+// =================================
+// MODAL ФОНЫН БАСҚАНДА ЖАБУ
+// =================================
 
 document
   .getElementById(
@@ -881,16 +1471,16 @@ document
       ) {
 
         closeConfirmModal();
+
       }
+
     }
   );
 
 
-/*
-=================================
-ОБНОВИТЬ БАТЫРМАСЫ
-=================================
-*/
+// =================================
+// ОБНОВИТЬ
+// =================================
 
 const refreshButton =
   document.querySelector(
@@ -905,16 +1495,16 @@ if (refreshButton) {
     function() {
 
       loadOrders();
+
     }
   );
+
 }
 
 
-/*
-=================================
-АВТОМАТТЫ ОБНОВЛЕНИЕ
-=================================
-*/
+// =================================
+// ӘР 5 СЕКУНД САЙЫН ЖАҢАРТУ
+// =================================
 
 function startAutoRefresh() {
 
@@ -923,6 +1513,7 @@ function startAutoRefresh() {
     clearInterval(
       refreshTimer
     );
+
   }
 
 
@@ -935,21 +1526,23 @@ function startAutoRefresh() {
       },
       5000
     );
+
 }
 
 
-/*
-=================================
-СТАРТ
-=================================
-*/
+// =================================
+// СТАРТ
+// =================================
 
 async function startAdmin() {
+
+  updateDateUI();
 
   await loadOrders();
 
   startAutoRefresh();
+
 }
 
 
-startAdmin();
+startAdmin();     
