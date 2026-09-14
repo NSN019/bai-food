@@ -1246,7 +1246,9 @@ async function sendOrder() {
       paymentMethod ===
       "Kaspi перевод"
         ? "kaspi"
-        : "cash"
+        : "cash",
+
+      orderType
 
     );
 
@@ -1281,7 +1283,8 @@ async function sendOrder() {
 
 function showSuccess(
   orderId = null,
-  paymentType = "cash"
+  paymentType = "cash",
+  orderType = "В заведении"
 ) {
 
   const modal =
@@ -1302,80 +1305,24 @@ function showSuccess(
     );
 
 
-  const paragraphs =
-    modal.querySelectorAll(
-      "p"
-    );
+  const message =
+    modal.querySelector("p");
 
+  title.textContent =
+    orderId
+      ? `Заказ №${orderId} принят`
+      : "Заказ принят";
 
-  // -------------------------------
-  // НАЛИЧНЫМИ
-  // -------------------------------
-
-  if (
-    paymentType ===
-    "cash"
-  ) {
-
-    title.textContent =
-      orderId
-        ? `Заказ №${orderId} принят`
-        : "Заказ принят";
-
-
-    if (
-      paragraphs[0]
-    ) {
-
-      paragraphs[0].textContent =
-        "Покажите номер заказа кассиру.";
-
+  if (message) {
+    if (orderType === "Доставка") {
+      message.textContent =
+        "Ваш заказ принят и будет передан на доставку.";
+    } else {
+      message.textContent =
+        paymentType === "kaspi"
+          ? "Покажите номер заказа кассиру. Кассир проверит поступление оплаты Kaspi и подтвердит заказ."
+          : "Покажите номер заказа кассиру и оплатите заказ наличными.";
     }
-
-
-    if (
-      paragraphs[1]
-    ) {
-
-      paragraphs[1].textContent =
-        "Заказ начнут готовить после оплаты наличными.";
-
-    }
-
-  }
-
-
-  // -------------------------------
-  // KASPI
-  // -------------------------------
-
-  else {
-
-    title.textContent =
-      orderId
-        ? `Заказ №${orderId} принят`
-        : "Заказ принят";
-
-
-    if (
-      paragraphs[0]
-    ) {
-
-      paragraphs[0].textContent =
-        "Kaspi перевод выбран.";
-
-    }
-
-
-    if (
-      paragraphs[1]
-    ) {
-
-      paragraphs[1].textContent =
-        "Кассир проверит поступление оплаты и подтвердит заказ.";
-
-    }
-
   }
 
 
@@ -1652,7 +1599,7 @@ document.addEventListener(
 
         if (phoneInput) {
 
-          phoneInput.style.display =
+          phoneInput.closest(".checkout-group").style.display =
             "none";
 
         }
@@ -1660,7 +1607,7 @@ document.addEventListener(
 
         if (addressInput) {
 
-          addressInput.style.display =
+          addressInput.closest(".checkout-group").style.display =
             "none";
 
         }
@@ -1682,7 +1629,7 @@ document.addEventListener(
 
         if (phoneInput) {
 
-          phoneInput.style.display =
+          phoneInput.closest(".checkout-group").style.display =
             "block";
 
         }
@@ -1690,7 +1637,7 @@ document.addEventListener(
 
         if (addressInput) {
 
-          addressInput.style.display =
+          addressInput.closest(".checkout-group").style.display =
             "block";
 
         }
