@@ -2,234 +2,77 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>BAI FOOD — Касса</title>
-
   <link rel="stylesheet" href="admin.css">
 </head>
-
 <body>
-
 <header class="topbar">
-  <div>
-    <p class="small-title">BAI FOOD & SUSHI BAR</p>
-    <h1>Касса</h1>
-  </div>
-
-  <div class="status-online">
-    <span></span>
-    Онлайн
+  <div><p class="small-title">BAI FOOD · БАКТЫБАЙ</p><h1>Касса</h1></div>
+  <div class="topbar-actions">
+    <div class="status-online"><span></span>Онлайн</div>
+    <button id="sound-button" class="sound-button" type="button" onclick="enableOrderSound()">🔔 Включить звук заказов</button>
   </div>
 </header>
 
-
 <main class="container">
+  <section id="new-order-alert" class="new-order-alert" hidden>
+    <div><strong id="new-order-alert-title">🔴 НОВЫЙ ЗАКАЗ</strong><span>Сигнал повторяется, пока остаётся непринятый заказ.</span></div>
+    <button type="button" onclick="showNewOrders()">Показать</button>
+  </section>
 
-  <!-- КҮНДІ ТАҢДАУ -->
   <section class="date-panel">
-
-    <button
-      class="date-arrow"
-      onclick="changeDate(-1)"
-    >
-      ←
-    </button>
-
-    <div class="date-center">
-
-      <span class="date-caption">
-        Заказы за день
-      </span>
-
-      <strong id="selected-date-label">
-        Сегодня
-      </strong>
-
-      <input
-        id="order-date"
-        class="date-input"
-        type="date"
-        onchange="selectDate(this.value)"
-      >
-
-    </div>
-
-    <button
-      class="date-arrow"
-      onclick="changeDate(1)"
-    >
-      →
-    </button>
-
-    <button
-      class="today-button"
-      onclick="goToday()"
-    >
-      Сегодня
-    </button>
-
+    <button class="date-arrow" onclick="changeDate(-1)" aria-label="Предыдущий день">←</button>
+    <div class="date-center"><span class="date-caption">Заказы за день</span><strong id="selected-date-label">Сегодня</strong><input id="order-date" class="date-input" type="date" onchange="selectDate(this.value)"></div>
+    <button class="date-arrow" onclick="changeDate(1)" aria-label="Следующий день">→</button>
+    <button class="today-button" onclick="goToday()">Сегодня</button>
   </section>
 
-
-  <!-- СТАТИСТИКА -->
   <section class="stats">
-
-    <div class="stat-card">
-      <span>Всего заказов</span>
-      <strong id="orders-count">0</strong>
-    </div>
-
-    <div class="stat-card">
-      <span>Ожидают оплаты</span>
-      <strong id="waiting-count">0</strong>
-    </div>
-
-    <div class="stat-card">
-      <span>Оплачено</span>
-      <strong id="paid-count">0</strong>
-    </div>
-
-    <div class="stat-card">
-      <span>Выручка</span>
-      <strong id="revenue">0 ₸</strong>
-    </div>
-
+    <div class="stat-card"><span>Всего заказов</span><strong id="orders-count">0</strong></div>
+    <div class="stat-card"><span>Ожидают оплаты</span><strong id="waiting-count">0</strong></div>
+    <div class="stat-card"><span>Оплачено</span><strong id="paid-count">0</strong></div>
+    <div class="stat-card"><span>Выручка</span><strong id="revenue">0 ₸</strong></div>
   </section>
 
-
-  <!-- ЗАКАЗДАР -->
-  <section class="toolbar">
-
-    <div>
-      <h2>Заказы</h2>
-
-      <p>
-        Новые заказы появляются автоматически
-      </p>
-    </div>
-
-    <button class="refresh-button">
-      ↻ Обновить
-    </button>
-
-  </section>
-
-
-  <!-- ФИЛЬТР -->
+  <section class="toolbar"><div><h2>Заказы</h2><p>Новые заказы появляются автоматически</p></div><button class="refresh-button">↻ Обновить</button></section>
   <div class="tabs">
-
-    <button
-      class="tab active"
-      onclick="setFilter('waiting', this)"
-    >
-      Ожидают оплаты
-    </button>
-
-    <button
-      class="tab"
-      onclick="setFilter('paid', this)"
-    >
-      Оплачено
-    </button>
-
-    <button
-      class="tab"
-      onclick="setFilter('all', this)"
-    >
-      Все
-    </button>
-
+    <button class="tab active" onclick="setFilter('waiting',this)">Ожидают оплаты</button>
+    <button class="tab" onclick="setFilter('paid',this)">Оплачено</button>
+    <button class="tab" onclick="setFilter('cancelled',this)">Отклонено</button>
+    <button class="tab" onclick="setFilter('all',this)">Все</button>
   </div>
-
-
-  <!-- ЗАКАЗ КАРТОЧКАЛАРЫ -->
-  <section
-    id="orders"
-    class="orders"
-  >
-  </section>
-
-
-  <!-- ЗАКАЗ ЖОҚ БОЛСА -->
-  <div
-    id="empty-state"
-    class="empty-state"
-  >
-
-    <div>🍣</div>
-
-    <h3>
-      Нет заказов
-    </h3>
-
-    <p>
-      За выбранный день заказов пока нет
-    </p>
-
-  </div>
-
+  <section id="orders" class="orders"></section>
+  <div id="empty-state" class="empty-state"><div>🍔</div><h3>Нет заказов</h3><p>За выбранный день заказов пока нет</p></div>
 </main>
 
-
-<!-- ТӨЛЕМДІ РАСТАУ -->
-<div
-  id="confirm-modal"
-  class="modal"
->
-
+<div id="confirm-modal" class="modal">
   <div class="modal-box">
-
-    <div
-      id="confirm-icon"
-      class="modal-icon"
-    >
-      💵
-    </div>
-
-    <h2 id="confirm-title">
-      Подтвердить оплату?
-    </h2>
-
-    <p id="confirm-text">
-      Заказ
-    </p>
-
-
-    <div class="modal-actions">
-
-      <button
-        class="cancel-button"
-        onclick="closeConfirmModal()"
-      >
-        Отмена
-      </button>
-
-      <button
-        id="confirm-payment-button"
-        class="confirm-button"
-        onclick="confirmPayment()"
-      >
-        ✓ Оплачено
-      </button>
-
-    </div>
-
+    <div id="confirm-icon" class="modal-icon">💵</div><h2 id="confirm-title">Подтвердить оплату?</h2><p id="confirm-text">Заказ</p>
+    <div class="modal-actions"><button class="cancel-button" onclick="closeConfirmModal()">Отмена</button><button id="confirm-payment-button" class="confirm-button" onclick="confirmPayment()">✓ Оплачено</button></div>
   </div>
-
 </div>
-
-
-<!-- ХАБАРЛАМА -->
-<div
-  id="toast"
-  class="toast"
->
-  ✓ Оплата подтверждена
+<div id="accept-modal" class="modal">
+  <div class="modal-box accept-time-box">
+    <div class="modal-icon">⏱️</div><h2>Время приготовления</h2><p id="accept-order-label">Выберите примерное время ожидания</p>
+    <div class="prep-time-options"><button onclick="confirmAcceptOrder(20)">20 минут</button><button onclick="confirmAcceptOrder(30)">30 минут</button><button onclick="confirmAcceptOrder(40)">40 минут</button></div>
+    <button class="cancel-button full-cancel" onclick="closeAcceptModal()">Отмена</button>
+  </div>
 </div>
-
-
+<div id="reject-modal" class="modal">
+  <div class="modal-box reject-box">
+    <div class="modal-icon">✕</div><h2>Отклонить заказ?</h2><p id="reject-order-label">Выберите причину. Заказ останется в истории.</p>
+    <div class="reject-reasons">
+      <label><input type="radio" name="rejection-reason" value="stop_list" checked> Позиция в стоп-листе</label>
+      <label><input type="radio" name="rejection-reason" value="no_ingredients"> Нет ингредиентов</label>
+      <label><input type="radio" name="rejection-reason" value="unreachable"> Не удалось связаться с клиентом</label>
+      <label><input type="radio" name="rejection-reason" value="other"> Другая причина</label>
+    </div>
+    <textarea id="rejection-comment" rows="3" maxlength="500" placeholder="Комментарий для кассы (необязательно)" hidden></textarea>
+    <div class="modal-actions"><button class="cancel-button" onclick="closeRejectModal()">Отмена</button><button id="confirm-reject-button" class="reject-confirm-button" onclick="confirmRejectOrder()">Отклонить</button></div>
+  </div>
+</div>
+<div id="toast" class="toast">Готово</div>
 <script src="admin.js"></script>
-
 </body>
 </html>
