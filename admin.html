@@ -42,6 +42,7 @@
     <button class="tab" onclick="setFilter('cancelled',this)">Отклонено</button>
     <button class="tab" onclick="setFilter('all',this)">Все</button>
   </div>
+  <section class="stop-panel"><div class="toolbar"><div><h2>STOP-лист</h2><p>Недоступные позиции синхронизируются через Supabase</p></div><button class="refresh-button" type="button" onclick="loadStopList()">↻ Обновить</button></div><div id="stop-list" class="stop-list"></div></section>
   <section id="orders" class="orders"></section>
   <div id="empty-state" class="empty-state"><div>🍔</div><h3>Нет заказов</h3><p>За выбранный день заказов пока нет</p></div>
 </main>
@@ -55,7 +56,7 @@
 <div id="accept-modal" class="modal">
   <div class="modal-box accept-time-box">
     <div class="modal-icon">⏱️</div><h2>Время приготовления</h2><p id="accept-order-label">Выберите примерное время ожидания</p>
-    <div class="prep-time-options"><button onclick="confirmAcceptOrder(20)">20 минут</button><button onclick="confirmAcceptOrder(30)">30 минут</button><button onclick="confirmAcceptOrder(40)">40 минут</button></div>
+    <div class="prep-time-options"><button onclick="confirmAcceptOrder(20)">20 минут</button><button onclick="confirmAcceptOrder(30)">30 минут</button><button onclick="confirmAcceptOrder(40)">40 минут</button><button onclick="confirmAcceptOrder(60)">60 минут</button><button onclick="confirmAcceptOrder(90)">90 минут</button></div>
     <button class="cancel-button full-cancel" onclick="closeAcceptModal()">Отмена</button>
   </div>
 </div>

@@ -1,6 +1,6 @@
 // BAI FOOD — клиент, корзина и совместимая интеграция Supabase
 const SUPABASE_URL = "https://elzjmbwkgleuzpybiqdg.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVsemptYndrZ2xldXpweWJpcWRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg1MDA1OTEsImV4cCI6MjEwNDA3NjU5MX0.JtcrSCdtV20YrMIyqYI66SjywOgGa4CVRqFRdpCujLg";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJIUzI1NiIsInJlZiI6ImVsemptYndrZ2xldXpweWJpcWRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg1MDA1OTEsImV4cCI6MjEwNDA3NjU5MX0.JtcrSCdtV20YrMIyqYI66SjywOgGa4CVRqFRdpCujLg";
 const KASPI_PAY_URL = "https://pay.kaspi.kz/pay/erdj2tbh";
 const GIFT_THRESHOLD = 10000;
 
@@ -40,13 +40,13 @@ const categories = [
   ]},
   { id:"pizza", name:"Пицца", icon:"🍕", items:[
     {id:"pizza-pepperoni",name:"Пепперони",price:2500,image:"assets/menu/pizza-pepperoni.webp"},{id:"pizza-pepperoni-hot",name:"Пепперони острый",price:2700,image:"assets/menu/pizza-pepperoni-stock.webp"},
-    {id:"pizza-hunter",name:"Пицца с охотничьими колбасами",price:2500,image:"assets/menu/pizza-mushroom-sausage.webp"},{id:"pizza-margarita",name:"Маргарита",price:2500,image:"assets/menu/pizza-cheese.webp"},
+    {id:"pizza-hunter",name:"Пицца с охотничьими колбасами",price:2500,image:"assets/menu/pizza-mushroom-sausage.webp"},{id:"pizza-margarita",name:"Маргарита",price:2500,image:"assets/menu/pizza-margarita.webp"},
     {id:"pizza-mushroom",name:"Грибная",price:2500,image:"assets/menu/pizza-mushroom.webp"},{id:"pizza-mushroom-sausage",name:"Грибы и колбаса",price:2500,image:"assets/menu/pizza-mushroom-sausage.webp"},
     {id:"pizza-chicken-mushroom",name:"Курица с грибами",price:2500,image:"assets/menu/pizza-mushroom.webp"},{id:"pizza-chicken",name:"Куриная",price:2500,image:"assets/menu/pizza-meat.webp"},
     {id:"pizza-cheese-chicken",name:"Сырный цыпленок",price:2800,image:"assets/menu/pizza-meat.webp"},{id:"pizza-cheese",name:"Сырная",price:2500,image:"assets/menu/pizza-cheese.webp"},
     {id:"pizza-mince",name:"Пицца с фаршем",price:3000,image:"assets/menu/pizza-mince.webp"},
     {id:"pizza-four-seasons",name:"4 сезона",price:3500,image:"assets/menu/pizza-four-seasons.webp"},{id:"pizza-mexican",name:"Мексиканская",price:3000,image:"assets/menu/pizza-meat.webp"},
-    {id:"pizza-assorti",name:"Ассорти",price:3500,image:"assets/menu/pizza-four-seasons.webp"}
+    {id:"pizza-assorti",name:"Ассорти",price:3500,image:"assets/menu/pizza-assorti.webp"}
   ]},
   { id:"chicken", name:"CHICKEN", icon:"🍗", items:[
     {id:"wings",name:"Крылышки",image:"assets/menu/wings.webp",options:[{id:"8-pcs",name:"8 шт",price:2790},{id:"12-pcs",name:"12 шт",price:3790},{id:"16-pcs",name:"16 шт",price:4790},{id:"20-pcs",name:"20 шт",price:5990}]},
@@ -61,7 +61,7 @@ const categories = [
   ]},
   { id:"sides", name:"Фри и снеки", icon:"🍟", items:[
     {id:"fries-medium",name:"Фри средний",price:700,image:"assets/menu/fries.webp"},
-    {id:"potato-balls-120",name:"Картофельные шарики 120 г",price:600,image:"assets/menu/potato-balls.webp"},{id:"potato-balls-200",name:"Картофельные шарики 200 г",price:900,image:"assets/menu/potato-balls.webp"},
+    {id:"potato-balls-200",name:"Картофельные шарики 200 г",price:900,image:"assets/menu/potato-balls.webp"},
     {id:"onion-rings",name:"Луковые кольца",price:900,image:"assets/menu/onion-rings.webp"},{id:"potato-wedges",name:"Картофельные дольки",price:900,image:"assets/menu/potato-wedges.webp"}
   ]},
   { id:"sauces", name:"Соусы", icon:"🥣", items:[
@@ -98,6 +98,16 @@ const categories = [
     {id:"maxi",name:"Maxi Tea",price:550,image:"assets/menu/maxi-05.webp"},{id:"mojito",name:"Mojito",price:550,image:"assets/menu/mojito-05.webp"},{id:"cola-1",name:"Coca-Cola 1 л",price:780,image:"assets/menu/cola-1.webp"},
     {id:"fuse-1",name:"Fuse Tea 1 л",price:780,image:"assets/menu/fuse-1.webp"},{id:"maxi-1",name:"Maxi Tea 1 л",price:780,image:"assets/menu/maxi-1.webp"},{id:"cola-15",name:"Coca-Cola 1.5 л",price:1000,image:"assets/menu/cola-15.webp"},
     {id:"fuse-15",name:"Fuse Tea 1.5 л",price:1000,image:"assets/menu/fuse-15.webp"},{id:"cola-2",name:"Coca-Cola 2 л",price:1300,image:"assets/menu/cola-2.webp"}
+  ]},
+  { id:"east", name:"Восточка", icon:"🍜", items:[
+    {id:"lagman-guyru",name:"Гуйру лағман",price:1600,image:"assets/menu/guyru-lagman.webp"},{id:"lagman-suyru",name:"Суйру лағман",price:1600,image:"assets/menu/suyru-lagman.webp"},
+    {id:"lagman-guyru-tsomyan",name:"Гуйру цомян",price:1800,image:"assets/menu/guyru-tsomyan.webp"},{id:"lagman-suyru-tsomyan",name:"Суйру цомян",price:1800,image:"assets/menu/suyru-tsomyan.webp"},
+    {id:"lagman-moguru",name:"Могуру",price:1900,image:"assets/menu/moguru.webp"},{id:"lagman-moshuru",name:"Мошуру",price:2000,image:"assets/menu/moshuru.webp"},{id:"lagman-hauhau",name:"Хаухау",price:2000,image:"assets/menu/hauhau.webp"}
+  ]},
+  { id:"fish", name:"Рыба", icon:"🐟", items:[
+    {id:"fish-sudak",name:"Судак",image:"assets/menu/fish-assorti.webp",options:[{id:"500g",name:"500 г",price:3300},{id:"700g",name:"700 г",price:4100},{id:"1kg",name:"1 кг",price:6100},{id:"1.5kg",name:"1.5 кг",price:8800}]},
+    {id:"fish-sazan",name:"Сазан",image:"assets/menu/fish-assorti.webp",options:[{id:"500g",name:"500 г",price:3300},{id:"700g",name:"700 г",price:4100},{id:"1kg",name:"1 кг",price:6100},{id:"1.5kg",name:"1.5 кг",price:8800}]},
+    {id:"fish-assorti",name:"Ассорти",image:"assets/menu/fish-assorti.webp",options:[{id:"1kg",name:"1 кг",price:6100},{id:"1.5kg",name:"1.5 кг",price:8800}]}
   ]}
 ];
 
@@ -114,6 +124,8 @@ let customizingProductId = null;
 let cartCount = 0;
 let cartTotal = 0;
 let statusPollTimer = null;
+let productAvailability = new Map();
+let setModalProductId = null, setModalQuantity = 1;
 const money = amount => `${new Intl.NumberFormat("ru-RU").format(amount)} ₸`;
 const escapeHTML = value => String(value).replace(/[&<>'"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#039;",'"':"&quot;"}[c]));
 
@@ -141,22 +153,34 @@ function renderNavigation(){
     `<button class="category" data-target="sets">🍱 Сеты</button>`,
     `<button class="category" data-target="sushi-sets">🍱 Суши сеты</button>`,
     `<button class="category" data-target="category-doner">🌯 Фастфуд</button>`,
-    `<button class="category" data-target="category-sushi">🍣 Суши</button>`
+    `<button class="category" data-target="category-sushi">🍣 Суши</button>`,
+    `<button class="category" data-target="category-east">🍜 Восточка</button>`,
+    `<button class="category" data-target="category-fish">🐟 Рыба</button>`,
+    `<button class="category" data-target="category-drinks">🥤 Напитки</button>`
   ].join("");
   document.getElementById("categories").addEventListener("click",event=>{const button=event.target.closest("[data-target]");if(!button)return;document.querySelectorAll(".category").forEach(node=>node.classList.toggle("active",node===button));document.getElementById(button.dataset.target)?.scrollIntoView({behavior:"smooth"})});
 }
 
+function isStopped(productId){return productAvailability.get(productId)===true}
 function productCard(product,icon){
+  const stopped=isStopped(product.id);
+  const isSet=sets.some(x=>x.id===product.id)||sushiSets.some(x=>x.id===product.id);
   const count=cart.filter(row=>row.productId===product.id).reduce((sum,row)=>sum+row.quantity,0);
   const customizable=Boolean(product.options||product.addons);
   const price=product.options?`от ${money(product.options[0].price)}`:money(product.price);
   const visual=product.image?`<img src="${product.image}" alt="${escapeHTML(product.name)}">`:`<div class="product-placeholder">${icon||product.icon||"🍽️"}</div><span class="photo-note">Фото будет добавлено</span>`;
-  return `<article class="product" data-product-id="${product.id}">
-    <div class="product-image">${product.isPromo?'<span class="hit-badge">АКЦИЯ</span>':""}${visual}</div>
+  return `<article class="product ${stopped?"stopped":""} ${isSet?"set-clickable":""}" data-product-id="${product.id}" ${isSet?`onclick="openSetModal('${product.id}')"`:""}>
+    <div class="product-image">${product.isPromo?'<span class="hit-badge">АКЦИЯ</span>':""}${stopped?'<span class="stop-badge">СТОП</span>':""}${visual}</div>
     <div class="product-content"><h3>${escapeHTML(product.name)}</h3><p class="product-description">${escapeHTML(product.description|| (customizable?"Выберите вариант и добавки":"BAI FOOD"))}</p>
     <div class="product-bottom"><div><strong class="price">${price}</strong>${customizable?'<small class="customize-hint">Настраивается</small>':""}</div>
-    <div class="quantity"><button class="minus-button" type="button" onclick="removeProduct('${product.id}')">−</button><span id="count-${product.id}">${count}</span><button class="add-button" type="button" onclick="selectProduct('${product.id}')">+</button></div></div></div></article>`;
+    <div class="quantity"><button class="minus-button" type="button" onclick="event.stopPropagation();removeProduct('${product.id}')">−</button><span id="count-${product.id}">${count}</span><button class="add-button" type="button" ${stopped?"disabled":""} onclick="event.stopPropagation();selectProduct('${product.id}')">+</button></div></div></div></article>`;
 }
+
+async function loadAvailability(){try{const r=await fetch(`${SUPABASE_URL}/rest/v1/product_availability?select=product_id,is_stopped`,{headers:{apikey:SUPABASE_ANON_KEY,Authorization:`Bearer ${SUPABASE_ANON_KEY}`}});if(!r.ok)return;productAvailability=new Map((await r.json()).map(x=>[x.product_id,Boolean(x.is_stopped)]));renderMenu()}catch(e){console.warn("STOP-list unavailable",e)}}
+function openSetModal(productId){const p=productIndex.get(productId);if(!p||isStopped(productId))return;setModalProductId=productId;setModalQuantity=1;document.getElementById("set-modal-photo").innerHTML=`<img src="${p.image}" alt="${escapeHTML(p.name)}">`;document.getElementById("set-modal-title").textContent=p.name;document.getElementById("set-modal-description").textContent=p.description||"Состав уточняется";document.getElementById("set-modal-price").textContent=money(p.price);document.getElementById("set-modal-quantity").textContent="1";showModal("set-modal")}
+function closeSetModal(){hideModal("set-modal");setModalProductId=null;setModalQuantity=1}
+function changeSetModalQuantity(delta){setModalQuantity=Math.max(1,Math.min(20,setModalQuantity+delta));document.getElementById("set-modal-quantity").textContent=String(setModalQuantity)}
+function addSetFromModal(){const p=productIndex.get(setModalProductId);if(!p||isStopped(p.id))return;for(let i=0;i<setModalQuantity;i++)addConfiguredItem(p.id,"",[],p.price);closeSetModal()}
 
 function renderMenu(){
   document.getElementById("sets-grid").innerHTML=sets.map(p=>productCard(p,p.icon)).join("");
@@ -167,7 +191,7 @@ function renderMenu(){
   }).join("");
 }
 
-function selectProduct(productId){const product=productIndex.get(productId);if(!product)return;if(product.options||product.addons)openCustomize(productId);else addConfiguredItem(productId,"",[],product.price)}
+function selectProduct(productId){const product=productIndex.get(productId);if(!product||isStopped(productId))return;if(product.options||product.addons)openCustomize(productId);else addConfiguredItem(productId,"",[],product.price)}
 function openCustomize(productId){
   const product=productIndex.get(productId);customizingProductId=productId;
   document.getElementById("customize-title").textContent=product.name;
@@ -242,8 +266,8 @@ if(typeof document!=="undefined"){
   document.querySelectorAll('input[name="cashChangeMode"]').forEach(input=>input.addEventListener("change",updateCashChange));
   document.getElementById("cash-change-from").addEventListener("input",updateCashChange);
   document.getElementById("delivery-zone").addEventListener("change",updateCheckoutSummary);
-  ["customize-modal","cart-modal","checkout-modal"].forEach(id=>document.getElementById(id).addEventListener("click",event=>{if(event.target.id===id)hideModal(id)}));
-  renderNavigation();renderMenu();refreshAll();syncCheckoutFields();updateCashChange();
+  ["set-modal","customize-modal","cart-modal","checkout-modal"].forEach(id=>document.getElementById(id).addEventListener("click",event=>{if(event.target.id===id)hideModal(id)}));
+  renderNavigation();renderMenu();refreshAll();syncCheckoutFields();updateCashChange();loadAvailability();setInterval(loadAvailability,15000);
   window.BAI_FOOD_TEST={calculateDeliveryFee,getAlmatyHour,ordinarySubtotal,productsSubtotal,qualifiesForGift,donerQuantity,freeAyranQuantity,qualifiesForAyranGift,getGiftItems,getOrderItems,getCheckoutState,calculateCashChange,sanitizeCartRows,saveOrderAndOpenPayment,KASPI_PAY_URL,categories,sets,sushiSets,productIndex,setCart:value=>{cart=value;saveCart();refreshAll()}};
 }
 if(typeof module!=="undefined")module.exports={calculateDeliveryFee,getAlmatyHour,ordinarySubtotal,productsSubtotal,qualifiesForGift,donerQuantity,freeAyranQuantity,qualifiesForAyranGift,getGiftItems,getOrderItems,calculateCashChange,sanitizeCartRows,saveOrderAndOpenPayment,KASPI_PAY_URL,categories,sets,sushiSets,productIndex,setCart:value=>{cart=value}};

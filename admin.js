@@ -1,5 +1,5 @@
 const SUPABASE_URL = "https://elzjmbwkgleuzpybiqdg.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVsemptYndrZ2xldXpweWJpcWRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg1MDA1OTEsImV4cCI6MjEwNDA3NjU5MX0.JtcrSCdtV20YrMIyqYI66SjywOgGa4CVRqFRdpCujLg";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJIUzI1NiIsInJlZiI6ImVsemptYndrZ2xldXpweWJpcWRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg1MDA1OTEsImV4cCI6MjEwNDA3NjU5MX0.JtcrSCdtV20YrMIyqYI66SjywOgGa4CVRqFRdpCujLg";
 
 let currentFilter="waiting",selectedOrderId=null,selectedAcceptOrderId=null,selectedRejectOrderId=null,orders=[];
 let accessToken=typeof localStorage!=="undefined"?localStorage.getItem("baiFoodAdminAccessToken"):null;
@@ -41,7 +41,7 @@ async function loadOrders(){
   try{const response=await fetch(`${SUPABASE_URL}/rest/v1/orders?select=*&order=created_at.desc&limit=200`,{headers:{apikey:SUPABASE_ANON_KEY,Authorization:`Bearer ${accessToken}`}});
     if(response.status===401){localStorage.removeItem("baiFoodAdminAccessToken");accessToken=null;const ok=await loginAdmin();if(ok)return loadOrders();return}
     if(!response.ok)throw new Error(await response.text());
-    orders=(await response.json()).map(normalizeOrder);renderOrders();syncAlarm();
+    orders=(await response.json()).map(normalizeOrder);renderOrders();syncAlarm();loadStopList();
   }catch(error){console.error(error);showToastMessage("Не удалось загрузить заказы",true)}
 }
 function getOrdersForSelectedDate(){return orders.filter(order=>orderDateKey(order.createdAt)===selectedDate)}
@@ -76,7 +76,7 @@ async function patchOrder(orderId,changes){const response=await fetch(`${SUPABAS
 async function postAdminRpc(name,body){const response=await fetch(`${SUPABASE_URL}/rest/v1/rpc/${name}`,{method:"POST",headers:{"Content-Type":"application/json",apikey:SUPABASE_ANON_KEY,Authorization:`Bearer ${accessToken}`},body:JSON.stringify(body)});if(!response.ok)throw new Error(await response.text());return response}
 function openAcceptModal(orderId){const order=orders.find(item=>String(item.id)===String(orderId));if(!isNewOrder(order))return;selectedAcceptOrderId=orderId;document.getElementById("accept-order-label").textContent=`Заказ №${orderId}: выберите время`;document.getElementById("accept-modal").style.display="flex"}
 function closeAcceptModal(){document.getElementById("accept-modal").style.display="none";selectedAcceptOrderId=null}
-async function confirmAcceptOrder(prepMinutes){if(![20,30,40].includes(Number(prepMinutes))||selectedAcceptOrderId==null)return;const orderId=selectedAcceptOrderId,order=orders.find(item=>String(item.id)===String(orderId));if(!isNewOrder(order)){closeAcceptModal();return}document.querySelectorAll(".prep-time-options button").forEach(button=>button.disabled=true);try{const acceptedAt=new Date().toISOString();await patchOrder(orderId,{accepted_at:acceptedAt,prep_minutes:Number(prepMinutes)});order.acceptedAt=acceptedAt;order.prepMinutes=Number(prepMinutes);closeAcceptModal();syncAlarm();await loadOrders();showToastMessage(`✓ Заказ принят · ${prepMinutes} минут`)}catch(error){console.error(error);showToastMessage("Не удалось принять. Проверьте SQL patch.",true)}finally{document.querySelectorAll(".prep-time-options button").forEach(button=>button.disabled=false)}}
+async function confirmAcceptOrder(prepMinutes){if(![20,30,40,60,90].includes(Number(prepMinutes))||selectedAcceptOrderId==null)return;const orderId=selectedAcceptOrderId,order=orders.find(item=>String(item.id)===String(orderId));if(!isNewOrder(order)){closeAcceptModal();return}document.querySelectorAll(".prep-time-options button").forEach(button=>button.disabled=true);try{const acceptedAt=new Date().toISOString();await patchOrder(orderId,{accepted_at:acceptedAt,prep_minutes:Number(prepMinutes)});order.acceptedAt=acceptedAt;order.prepMinutes=Number(prepMinutes);closeAcceptModal();syncAlarm();await loadOrders();showToastMessage(`✓ Заказ принят · ${prepMinutes} минут`)}catch(error){console.error(error);showToastMessage("Не удалось принять. Проверьте SQL patch.",true)}finally{document.querySelectorAll(".prep-time-options button").forEach(button=>button.disabled=false)}}
 
 function openRejectModal(orderId){const order=orders.find(item=>String(item.id)===String(orderId));if(!isNewOrder(order))return;selectedRejectOrderId=orderId;document.getElementById("reject-order-label").textContent=`Заказ №${orderId}: выберите причину. Заказ останется в истории.`;document.querySelector('input[name="rejection-reason"][value="stop_list"]').checked=true;document.getElementById("rejection-comment").value="";document.getElementById("rejection-comment").hidden=true;document.getElementById("reject-modal").style.display="flex"}
 function closeRejectModal(){document.getElementById("reject-modal").style.display="none";selectedRejectOrderId=null}
@@ -90,6 +90,13 @@ async function confirmPayment(){if(selectedOrderId==null)return;const id=selecte
 function updateStats(){const day=getOrdersForSelectedDate(),waiting=day.filter(o=>o.paymentStatus==="waiting"&&o.orderStatus!=="cancelled"),paid=day.filter(o=>o.paymentStatus==="paid"&&o.orderStatus!=="cancelled");document.getElementById("orders-count").textContent=day.length;document.getElementById("waiting-count").textContent=waiting.length;document.getElementById("paid-count").textContent=paid.length;document.getElementById("revenue").textContent=formatMoney(paid.reduce((sum,o)=>sum+o.total,0))}
 function formatTime(value){return new Date(value).toLocaleTimeString("ru-RU",{timeZone:"Asia/Almaty",hour:"2-digit",minute:"2-digit"})}
 function formatMoney(amount){return `${new Intl.NumberFormat("ru-RU").format(amount)} ₸`}
+
+const STOP_PRODUCTS = [
+  ["doner-chicken","Донер куриный"],["doner-beef","Донер говяжий"],["doner-assorti","Донер ассорти"],["strips","Стрипсы"],["sushi-philadelphia","Филадельфия"],["lagman-guyru","Гуйру лағман"],["lagman-suyru","Суйру лағман"],["lagman-guyru-tsomyan","Гуйру цомян"],["lagman-suyru-tsomyan","Суйру цомян"],["lagman-moguru","Могуру"],["lagman-moshuru","Мошуру"],["lagman-hauhau","Хаухау"],["fish-sudak","Судак"],["fish-sazan","Сазан"],["fish-assorti","Ассорти"]
+];
+async function loadStopList(){if(!accessToken)return;try{const r=await fetch(`${SUPABASE_URL}/rest/v1/product_availability?select=product_id,display_name,is_stopped&order=display_name`,{headers:{apikey:SUPABASE_ANON_KEY,Authorization:`Bearer ${accessToken}`}});if(!r.ok)throw new Error(await r.text());const rows=await r.json(),box=document.getElementById("stop-list");box.innerHTML=rows.map(x=>`<div class="stop-row"><span>${escapeHTML(x.display_name||x.product_id)}</span><button class="${x.is_stopped?"stop-active":""}" onclick="setProductStop('${x.product_id}',${!x.is_stopped})">${x.is_stopped?"Снять со стопа":"СТОП"}</button></div>`).join("")}catch(e){console.warn(e)}}
+async function setProductStop(productId,isStopped){try{await postAdminRpc("set_product_stop_v1",{p_product_id:productId,p_is_stopped:Boolean(isStopped)});await loadStopList();showToastMessage(isStopped?"Позиция поставлена в STOP":"Позиция снова доступна")}catch(e){console.error(e);showToastMessage("Не удалось изменить STOP-лист",true)}}
+
 function escapeHTML(value){return String(value).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;")}
 function showToastMessage(message,isError=false){const toast=document.getElementById("toast");toast.textContent=message;toast.style.borderColor=isError?"#71332f":"#265d34";toast.style.background=isError?"#3a1715":"#15341e";toast.style.color=isError?"#ffaaa4":"#77e493";toast.classList.add("show");setTimeout(()=>toast.classList.remove("show"),2600)}
 

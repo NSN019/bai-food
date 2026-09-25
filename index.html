@@ -23,6 +23,7 @@
       <div class="hero-info">
         <div><span class="info-icon">◷</span><span>10:00–22:00</span></div>
         <div><span class="info-icon">🚚</span><span>4 зоны доставки</span></div>
+        <a class="hero-phone" href="tel:+77781577796"><span class="info-icon">☎</span><span>+7 (778) 157-77-96</span></a>
       </div>
       <div class="hero-buttons">
         <button class="main-menu-button" type="button" onclick="document.getElementById('menu').scrollIntoView({behavior:'smooth'})">📖 Смотреть меню</button>
@@ -34,7 +35,7 @@
     <button class="feature-item feature-button" type="button" onclick="document.getElementById('promotions').scrollIntoView({behavior:'smooth'})"><span>🔥</span><p><strong>Акции</strong><br>подарки к заказу</p></button>
     <div class="feature-item"><span>🚚</span><p>Доставка<br>по зонам</p></div>
     <div class="feature-item"><span>🍔</span><p>Большие<br>порции</p></div>
-    <div class="feature-item"><span>💳</span><p>Kaspi /<br>Наличные</p></div>
+    <div class="feature-item"><span>💳</span><p>Kaspi Red /<br>Наличные</p></div>
   </section>
 
   <section class="categories-section" id="menu">
@@ -67,6 +68,19 @@
     <div class="cart-left">🛒 <span>Корзина</span></div>
     <span id="cart-info">0 товаров — 0 ₸</span>
     <span class="cart-arrow">›</span>
+  </div>
+
+
+  <div id="set-modal" class="cart-modal" aria-hidden="true">
+    <div class="cart-box customize-box set-detail-box">
+      <button class="close-cart" type="button" onclick="closeSetModal()">×</button>
+      <div id="set-modal-photo" class="customize-photo"></div>
+      <h2 id="set-modal-title"></h2>
+      <p id="set-modal-description" class="modal-description set-composition"></p>
+      <div class="customize-total"><span>Цена</span><strong id="set-modal-price"></strong></div>
+      <div class="set-quantity"><button type="button" onclick="changeSetModalQuantity(-1)">−</button><strong id="set-modal-quantity">1</strong><button type="button" onclick="changeSetModalQuantity(1)">+</button></div>
+      <button class="checkout-button" type="button" onclick="addSetFromModal()">Добавить в корзину</button>
+    </div>
   </div>
 
   <div id="customize-modal" class="cart-modal" aria-hidden="true">

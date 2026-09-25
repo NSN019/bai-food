@@ -1,0 +1,66 @@
+{
+  "passed": 15,
+  "failed": 0,
+  "results": [
+    [
+      "120g removed",
+      true
+    ],
+    [
+      "7 lagman",
+      true
+    ],
+    [
+      "fish variants",
+      true
+    ],
+    [
+      "same fish photo",
+      true
+    ],
+    [
+      "phone tel",
+      true
+    ],
+    [
+      "Kaspi Red label",
+      true
+    ],
+    [
+      "nav new categories",
+      true
+    ],
+    [
+      "prep 60/90",
+      true
+    ],
+    [
+      "client prep server status",
+      true
+    ],
+    [
+      "set modal",
+      true
+    ],
+    [
+      "stop UI",
+      true
+    ],
+    [
+      "stop server",
+      true
+    ],
+    [
+      "server canonical prices",
+      true
+    ],
+    [
+      "existing drinks/sauces preserved",
+      true
+    ],
+    [
+      "assets exist",
+      true
+    ]
+  ]
+}
