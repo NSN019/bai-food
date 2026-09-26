@@ -34,6 +34,21 @@ alter table public.product_availability enable row level security;
 insert into public.product_availability (product_id, display_name)
 values
   ('set-1','SET 1'),('set-3','SET 3'),('set-4','SET 4'),
+  ('sushi-set-1','Суши SET №1'),('sushi-set-2','Суши SET №2'),
+  ('sushi-set-3','Суши SET №3'),('sushi-set-5','Суши SET №5'),
+  ('sushi-set-6','Суши SET №6'),('sushi-set-7','Суши SET №7'),
+  ('sushi-set-8','Суши SET №8'),('sushi-set-9','Суши SET №9'),
+  ('sushi-philadelphia','Филадельфия'),('sushi-philadelphia-cucumber','Филадельфия с огурцом'),
+  ('sushi-philadelphia-grill','Филадельфия гриль'),('sushi-alaska','Аляска'),
+  ('sushi-california','Калифорния'),('sushi-bonito','Бонито'),
+  ('sushi-america','Америка'),('sushi-caesar','Цезарь'),
+  ('sushi-salmon-tempura','Лосось темпура'),('sushi-caesar-hat','Цезарь с шапочкой'),
+  ('sushi-sake-tempura','Саке темпура'),('sushi-america-chicken','Америка с курицей'),
+  ('sushi-baked','Запечённые роллы'),('sushi-burger','Суши-бургер'),
+  ('sushi-sandwich','Суши-сэндвич с лососем'),('sushi-baked-caesar','Запечённый цезарь'),
+  ('sushi-salmon-maki','Ролл с лососем'),('sushi-spice-roll','Спайс ролл'),
+  ('sushi-tomato-maki','Томато маки'),('sushi-tobiko-maki','Ролл Тобико'),
+  ('sushi-cucumber-maki','Ролл с огурцом'),
   ('doner-chicken','Донер куриный'),('doner-beef','Донер говяжий'),
   ('doner-assorti','Донер ассорти'),('doner-chicken-15','Куриный 1.5'),
   ('doner-beef-15','Говяжий 1.5'),('doner-assorti-15','Ассорти 1.5'),
@@ -185,6 +200,37 @@ begin
     when 'set-3' then v_name := 'SET 3'; v_price := 10900; v_is_promo := true;
     when 'set-4' then v_name := 'SET 4'; v_price := 15900; v_is_promo := true;
 
+    when 'sushi-set-1' then v_name := 'Суши SET №1'; v_price := 5990; v_is_promo := true;
+    when 'sushi-set-2' then v_name := 'Суши SET №2'; v_price := 6990; v_is_promo := true;
+    when 'sushi-set-3' then v_name := 'Суши SET №3'; v_price := 8490; v_is_promo := true;
+    when 'sushi-set-5' then v_name := 'Суши SET №5'; v_price := 8490; v_is_promo := true;
+    when 'sushi-set-6' then v_name := 'Суши SET №6'; v_price := 5490; v_is_promo := true;
+    when 'sushi-set-7' then v_name := 'Суши SET №7'; v_price := 11990; v_is_promo := true;
+    when 'sushi-set-8' then v_name := 'Суши SET №8'; v_price := 10990; v_is_promo := true;
+    when 'sushi-set-9' then v_name := 'Суши SET №9'; v_price := 17990; v_is_promo := true;
+
+    when 'sushi-philadelphia' then v_name := 'Филадельфия'; v_price := 2790;
+    when 'sushi-philadelphia-cucumber' then v_name := 'Филадельфия с огурцом'; v_price := 2690;
+    when 'sushi-philadelphia-grill' then v_name := 'Филадельфия гриль'; v_price := 2890;
+    when 'sushi-alaska' then v_name := 'Аляска'; v_price := 2390;
+    when 'sushi-california' then v_name := 'Калифорния'; v_price := 2490;
+    when 'sushi-bonito' then v_name := 'Бонито'; v_price := 2190;
+    when 'sushi-america' then v_name := 'Америка'; v_price := 2890;
+    when 'sushi-caesar' then v_name := 'Цезарь'; v_price := 2290;
+    when 'sushi-salmon-tempura' then v_name := 'Лосось темпура'; v_price := 2990;
+    when 'sushi-caesar-hat' then v_name := 'Цезарь с шапочкой'; v_price := 2790;
+    when 'sushi-sake-tempura' then v_name := 'Саке темпура'; v_price := 2890;
+    when 'sushi-america-chicken' then v_name := 'Америка с курицей'; v_price := 2490;
+    when 'sushi-baked' then v_name := 'Запечённые роллы';
+    when 'sushi-burger' then v_name := 'Суши-бургер';
+    when 'sushi-sandwich' then v_name := 'Суши-сэндвич с лососем'; v_price := 2800;
+    when 'sushi-baked-caesar' then v_name := 'Запечённый цезарь'; v_price := 2590;
+    when 'sushi-salmon-maki' then v_name := 'Ролл с лососем'; v_price := 1400;
+    when 'sushi-spice-roll' then v_name := 'Спайс ролл'; v_price := 1200;
+    when 'sushi-tomato-maki' then v_name := 'Томато маки'; v_price := 700;
+    when 'sushi-tobiko-maki' then v_name := 'Ролл Тобико'; v_price := 700;
+    when 'sushi-cucumber-maki' then v_name := 'Ролл с огурцом'; v_price := 900;
+
     when 'doner-chicken' then v_name := 'Донер куриный'; v_price := 1400; v_allowed_addons := array['cheese','mushrooms','double','pepper'];
     when 'doner-beef' then v_name := 'Донер говяжий'; v_price := 1800; v_allowed_addons := array['cheese','mushrooms','double','pepper'];
     when 'doner-assorti' then v_name := 'Донер ассорти'; v_price := 1700; v_allowed_addons := array['cheese','mushrooms','double','pepper'];
@@ -290,6 +336,22 @@ begin
       when '1-patty' then v_variant_name := '1 котлета'; v_price := 1500;
       when '2-patties' then v_variant_name := '2 котлеты'; v_price := 2200;
       else raise exception 'invalid burger variant';
+    end case;
+  end if;
+
+
+  -- Варианты суши с выбором начинки.
+  if v_product_id = 'sushi-baked' then
+    case v_variant_id
+      when 'chicken' then v_variant_name := 'С курицей'; v_price := 2890;
+      when 'salmon' then v_variant_name := 'С лососем'; v_price := 2890;
+      else raise exception 'invalid sushi baked variant';
+    end case;
+  elsif v_product_id = 'sushi-burger' then
+    case v_variant_id
+      when 'chicken' then v_variant_name := 'С курицей'; v_price := 2500;
+      when 'salmon' then v_variant_name := 'С лососем'; v_price := 2800;
+      else raise exception 'invalid sushi burger variant';
     end case;
   end if;
 

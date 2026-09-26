@@ -141,7 +141,7 @@
           <label><input type="radio" name="payment" value="Kaspi перевод"><span><b>Kaspi перевод</b><small>После оформления откроется Kaspi Pay</small></span></label>
         </div>
       </div>
-      <div id="kaspi-payment"><p>После оформления откроется Kaspi Pay. Введите итоговую сумму заказа вручную.</p></div>
+      <div id="kaspi-payment"><p>Введите итоговую сумму заказа вручную.</p></div>
       <div id="cash-change" class="cash-change">
         <p>Нужна сдача?</p>
         <div class="choice-cards">
@@ -155,6 +155,7 @@
       </div>
       <div class="checkout-summary">
         <div><span>Товары</span><strong id="checkout-products-total">0 ₸</strong></div>
+        <div><span>Обслуживание 10%</span><strong id="checkout-service-fee">0 ₸</strong></div>
         <div><span>Доставка</span><strong id="checkout-delivery-fee">—</strong></div>
         <div class="checkout-grand"><span>Итого</span><strong id="checkout-grand-total">0 ₸</strong></div>
       </div>
@@ -173,6 +174,17 @@
       <div id="success-payment-status" class="success-payment-status" hidden>Ожидаем подтверждения оплаты кассиром</div>
       <h3 id="success-total">Итого: 0 ₸</h3>
       <button class="checkout-button" type="button" onclick="closeSuccess()">На главную</button>
+    </div>
+  </div>
+
+  <div id="recovery-modal" class="cart-modal" aria-hidden="true">
+    <div class="cart-box">
+      <h2>Новый пароль</h2>
+      <p class="modal-description">Введите новый пароль для кассы.</p>
+      <input type="password" id="recovery-password" placeholder="Новый пароль" autocomplete="new-password" minlength="8">
+      <input type="password" id="recovery-password-repeat" placeholder="Повторите пароль" autocomplete="new-password" minlength="8">
+      <p id="recovery-error" class="checkout-error"></p>
+      <button id="recovery-save-button" class="checkout-button" type="button" onclick="saveRecoveredPassword()">Сохранить пароль</button>
     </div>
   </div>
 
