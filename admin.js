@@ -14,11 +14,51 @@ function changeDate(days){const[y,m,d]=selectedDate.split("-").map(Number),date=
 function selectDate(value){if(!value)return;selectedDate=value;updateDateUI();renderOrders()}
 function goToday(){selectedDate=getLocalDateKey(new Date());updateDateUI();renderOrders()}
 
-async function loginAdmin(){
-  const email=prompt("Введите email кассира:");if(!email)return false;
-  const password=prompt("Введите пароль:");if(!password)return false;
-  try{const response=await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`,{method:"POST",headers:{"Content-Type":"application/json",apikey:SUPABASE_ANON_KEY},body:JSON.stringify({email,password})});if(!response.ok){alert("Email или пароль неверный.");return false}const data=await response.json();accessToken=data.access_token;localStorage.setItem("baiFoodAdminAccessToken",accessToken);return true}catch(error){console.error(error);alert("Не удалось подключиться к серверу.");return false}
+function authEl(id){return document.getElementById(id)}
+function showAuthView(view){
+  const overlay=authEl("auth-overlay");if(!overlay)return;
+  overlay.style.display="flex";
+  authEl("login-form").hidden=view!=="login";
+  authEl("forgot-form").hidden=view!=="forgot";
+  authEl("recovery-form").hidden=view!=="recovery";
+  authEl("auth-title").textContent=view==="forgot"?"Восстановление пароля":view==="recovery"?"Новый пароль":"Вход в кассу";
+  authEl("auth-subtitle").textContent=view==="forgot"?"Отправим безопасную ссылку на email кассира":view==="recovery"?"Придумайте новый пароль для кассы":"Введите email и пароль кассира";
 }
+function hideAuth(){const overlay=authEl("auth-overlay");if(overlay)overlay.style.display="none"}
+function setAuthMessage(id,message,isError=false){const el=authEl(id);if(!el)return;el.textContent=message;el.hidden=!message;el.classList.toggle("error",Boolean(isError))}
+function parseRecoverySession(){
+  const hash=new URLSearchParams(location.hash.replace(/^#/,""));
+  const query=new URLSearchParams(location.search);
+  const type=hash.get("type")||query.get("type");
+  const token=hash.get("access_token");
+  if(type==="recovery"&&token){accessToken=token;localStorage.setItem("baiFoodAdminAccessToken",token);history.replaceState({},document.title,location.pathname+"?recovery=1");return true}
+  return query.get("recovery")==="1"&&Boolean(accessToken);
+}
+async function verifyCashier(token){
+  const response=await fetch(`${SUPABASE_URL}/rest/v1/staff?select=role&limit=1`,{headers:{apikey:SUPABASE_ANON_KEY,Authorization:`Bearer ${token}`}});
+  if(!response.ok)return false;const rows=await response.json();return rows.some(row=>row.role==="cashier");
+}
+async function loginAdmin(email,password){
+  try{
+    const response=await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`,{method:"POST",headers:{"Content-Type":"application/json",apikey:SUPABASE_ANON_KEY},body:JSON.stringify({email,password})});
+    if(!response.ok){setAuthMessage("login-error","Email или пароль неверный.",true);return false}
+    const data=await response.json();
+    if(!await verifyCashier(data.access_token)){setAuthMessage("login-error","У этого аккаунта нет доступа кассира.",true);return false}
+    accessToken=data.access_token;localStorage.setItem("baiFoodAdminAccessToken",accessToken);hideAuth();return true;
+  }catch(error){console.error(error);setAuthMessage("login-error","Не удалось подключиться к серверу.",true);return false}
+}
+async function sendRecovery(email){
+  const redirectTo=`${location.origin}${location.pathname}?recovery=1`;
+  const response=await fetch(`${SUPABASE_URL}/auth/v1/recover?redirect_to=${encodeURIComponent(redirectTo)}`,{method:"POST",headers:{"Content-Type":"application/json",apikey:SUPABASE_ANON_KEY},body:JSON.stringify({email})});
+  if(response.status===429)throw new Error("Слишком много попыток. Подождите немного и попробуйте снова.");
+  if(!response.ok)throw new Error("Не удалось отправить письмо. Проверьте email.");
+}
+async function updateRecoveredPassword(password){
+  const response=await fetch(`${SUPABASE_URL}/auth/v1/user`,{method:"PUT",headers:{"Content-Type":"application/json",apikey:SUPABASE_ANON_KEY,Authorization:`Bearer ${accessToken}`},body:JSON.stringify({password})});
+  if(!response.ok)throw new Error("Не удалось сохранить новый пароль. Откройте свежую ссылку восстановления.");
+  localStorage.removeItem("baiFoodAdminAccessToken");accessToken=null;
+}
+
 
 function normalizeOrder(order){
   const rawItems=Array.isArray(order.items)?order.items:[];
@@ -38,9 +78,9 @@ function isNewOrder(order){return Boolean(order&&!order.acceptedAt&&!order.cance
 function cancellationReasonLabel(reason){return({stop_list:"Позиция в стоп-листе",no_ingredients:"Нет ингредиентов",unreachable:"Не удалось связаться с клиентом",other:"Другая причина"})[reason]||"Причина не указана"}
 
 async function loadOrders(){
-  if(!accessToken){const ok=await loginAdmin();if(!ok)return}
+  if(!accessToken){showAuthView("login");return}
   try{const response=await fetch(`${SUPABASE_URL}/rest/v1/orders?select=*&order=created_at.desc&limit=200`,{headers:{apikey:SUPABASE_ANON_KEY,Authorization:`Bearer ${accessToken}`}});
-    if(response.status===401){localStorage.removeItem("baiFoodAdminAccessToken");accessToken=null;const ok=await loginAdmin();if(ok)return loadOrders();return}
+    if(response.status===401){localStorage.removeItem("baiFoodAdminAccessToken");accessToken=null;showAuthView("login");return}
     if(!response.ok)throw new Error(await response.text());
     orders=(await response.json()).map(normalizeOrder);renderOrders();syncAlarm();loadStopList();
   }catch(error){console.error(error);showToastMessage("Не удалось загрузить заказы",true)}
@@ -108,9 +148,14 @@ function syncAlarm(){const pending=unacceptedOrders(),alertBox=document.getEleme
 async function enableOrderSound(){try{audioContext=audioContext||new(window.AudioContext||window.webkitAudioContext)();await audioContext.resume();soundEnabled=true;const button=document.getElementById("sound-button");button.classList.add("enabled");button.textContent="🔔 Звук заказов включён";playOrderSignal();syncAlarm()}catch(error){console.error(error);showToastMessage("Браузер не разрешил звук",true)}}
 function playOrderSignal(){if(!soundEnabled||!unacceptedOrders().length||!audioContext||soundPlaying)return;const now=audioContext.currentTime,master=audioContext.createGain();master.gain.setValueAtTime(.65,now);master.connect(audioContext.destination);const notes=[{t:0,f:783.99,d:.48},{t:.18,f:1046.5,d:.62},{t:.64,f:1318.51,d:.7}];soundPlaying=true;activeSoundNodes=[];notes.forEach(note=>{const oscillator=audioContext.createOscillator(),gain=audioContext.createGain();oscillator.type="sine";oscillator.frequency.setValueAtTime(note.f,now+note.t);gain.gain.setValueAtTime(.0001,now+note.t);gain.gain.exponentialRampToValueAtTime(.2,now+note.t+.018);gain.gain.exponentialRampToValueAtTime(.0001,now+note.t+note.d);oscillator.connect(gain).connect(master);oscillator.start(now+note.t);oscillator.stop(now+note.t+note.d+.03);activeSoundNodes.push(oscillator)});setTimeout(()=>{activeSoundNodes=[];soundPlaying=false},1500)}
 
-function startAutoRefresh(){if(refreshTimer)clearInterval(refreshTimer);refreshTimer=setInterval(loadOrders,5000)}
-async function startAdmin(){updateDateUI();await loadOrders();startAutoRefresh()}
+function startAutoRefresh(){if(refreshTimer)clearInterval(refreshTimer);refreshTimer=setInterval(()=>{if(accessToken)loadOrders()},5000)}
+async function startAdmin(){updateDateUI();if(parseRecoverySession()){showAuthView("recovery");return}if(accessToken){hideAuth();await loadOrders()}else showAuthView("login");startAutoRefresh()}
 if(typeof document!=="undefined"){
+  authEl("login-form").addEventListener("submit",async event=>{event.preventDefault();setAuthMessage("login-error","");const button=authEl("login-button");button.disabled=true;const ok=await loginAdmin(authEl("login-email").value.trim(),authEl("login-password").value);button.disabled=false;if(ok){await loadOrders();startAutoRefresh()}});
+  authEl("forgot-button").addEventListener("click",()=>{authEl("forgot-email").value=authEl("login-email").value.trim();setAuthMessage("forgot-message","");showAuthView("forgot")});
+  authEl("back-login").addEventListener("click",()=>showAuthView("login"));
+  authEl("forgot-form").addEventListener("submit",async event=>{event.preventDefault();const button=authEl("forgot-submit");button.disabled=true;try{await sendRecovery(authEl("forgot-email").value.trim());setAuthMessage("forgot-message","Ссылка отправлена. Проверьте почту.")}catch(error){setAuthMessage("forgot-message",error.message,true)}finally{button.disabled=false}});
+  authEl("recovery-form").addEventListener("submit",async event=>{event.preventDefault();const p=authEl("new-password").value,c=authEl("new-password-confirm").value;if(p.length<8){setAuthMessage("recovery-message","Пароль должен содержать минимум 8 символов.",true);return}if(p!==c){setAuthMessage("recovery-message","Пароли не совпадают.",true);return}const button=authEl("recovery-submit");button.disabled=true;try{await updateRecoveredPassword(p);history.replaceState({},document.title,location.pathname);authEl("login-password").value="";setAuthMessage("login-error","Пароль изменён. Войдите с новым паролем.");showAuthView("login")}catch(error){setAuthMessage("recovery-message",error.message,true)}finally{button.disabled=false}});
   document.getElementById("confirm-modal").addEventListener("click",function(event){if(event.target===this)closeConfirmModal()});
   document.getElementById("accept-modal").addEventListener("click",function(event){if(event.target===this)closeAcceptModal()});
   document.getElementById("reject-modal").addEventListener("click",function(event){if(event.target===this)closeRejectModal()});

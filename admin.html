@@ -47,6 +47,34 @@
   <div id="empty-state" class="empty-state"><div>🍔</div><h3>Нет заказов</h3><p>За выбранный день заказов пока нет</p></div>
 </main>
 
+
+<div id="auth-overlay" class="auth-overlay">
+  <div class="auth-card">
+    <p class="small-title">BAI FOOD · БАКТЫБАЙ</p>
+    <h2 id="auth-title">Вход в кассу</h2>
+    <p id="auth-subtitle">Введите email и пароль кассира</p>
+    <form id="login-form" class="auth-form">
+      <label>Email<input id="login-email" type="email" autocomplete="username" required placeholder="cashier@example.com"></label>
+      <label>Пароль<input id="login-password" type="password" autocomplete="current-password" required minlength="6" placeholder="••••••••"></label>
+      <div id="login-error" class="auth-error" hidden></div>
+      <button id="login-button" class="auth-primary" type="submit">Войти</button>
+      <button id="forgot-button" class="auth-link" type="button">Забыли пароль?</button>
+    </form>
+    <form id="forgot-form" class="auth-form" hidden>
+      <label>Email кассира<input id="forgot-email" type="email" autocomplete="email" required placeholder="cashier@example.com"></label>
+      <div id="forgot-message" class="auth-message" hidden></div>
+      <button id="forgot-submit" class="auth-primary" type="submit">Отправить ссылку</button>
+      <button id="back-login" class="auth-link" type="button">Назад ко входу</button>
+    </form>
+    <form id="recovery-form" class="auth-form" hidden>
+      <label>Новый пароль<input id="new-password" type="password" autocomplete="new-password" required minlength="8" placeholder="Минимум 8 символов"></label>
+      <label>Повторите пароль<input id="new-password-confirm" type="password" autocomplete="new-password" required minlength="8" placeholder="Повторите пароль"></label>
+      <div id="recovery-message" class="auth-message" hidden></div>
+      <button id="recovery-submit" class="auth-primary" type="submit">Сохранить новый пароль</button>
+    </form>
+  </div>
+</div>
+
 <div id="confirm-modal" class="modal">
   <div class="modal-box">
     <div id="confirm-icon" class="modal-icon">💵</div><h2 id="confirm-title">Подтвердить оплату?</h2><p id="confirm-text">Заказ</p>
