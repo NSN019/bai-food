@@ -42,7 +42,13 @@
     <button class="tab" onclick="setFilter('cancelled',this)">Отклонено</button>
     <button class="tab" onclick="setFilter('all',this)">Все</button>
   </div>
-  <section class="stop-panel"><div class="toolbar"><div><h2>STOP-лист</h2><p>Недоступные позиции синхронизируются через Supabase</p></div><button class="refresh-button" type="button" onclick="loadStopList()">↻ Обновить</button></div><div id="stop-list" class="stop-list"></div></section>
+  <details class="stop-panel">
+  <summary class="stop-summary"><div><h2>STOP-лист</h2><p>Нажмите, чтобы открыть полный список</p></div><span class="stop-summary-arrow" aria-hidden="true">▼</span></summary>
+  <div class="stop-panel-content">
+    <div class="stop-panel-actions"><p>Недоступные позиции синхронизируются через Supabase</p><button class="refresh-button" type="button" onclick="loadStopList()">↻ Обновить</button></div>
+    <div id="stop-list" class="stop-list"></div>
+  </div>
+</details>
   <section id="orders" class="orders"></section>
   <div id="empty-state" class="empty-state"><div>🍔</div><h3>Нет заказов</h3><p>За выбранный день заказов пока нет</p></div>
 </main>
