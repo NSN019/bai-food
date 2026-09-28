@@ -58,6 +58,9 @@ const categories = [
     {id:"chef-burger-hot",name:"Шеф бургер острый",image:"assets/menu/burger-single.webp",options:[{id:"1-patty",name:"1 котлета",price:1440},{id:"2-patties",name:"2 котлеты",price:2100}]},
     {id:"cheeseburger-onion",name:"Чизбургер с луком",image:"assets/menu/burger-double.webp",options:[{id:"1-patty",name:"1 котлета",price:1500},{id:"2-patties",name:"2 котлеты",price:2200}]},
     {id:"cheeseburger-onion-hot",name:"Чизбургер с луком острый",image:"assets/menu/burger-double.webp",options:[{id:"1-patty",name:"1 котлета",price:1500},{id:"2-patties",name:"2 котлеты",price:2200}]}
+ ,
+    {id:"cheeseburger-chicken",name:"Чизбургер куриный",image:"assets/menu/cheeseburger-chicken.webp",options:[{id:"1-patty",name:"1 котлета",price:1390},{id:"2-patties",name:"2 котлеты",price:1690}]},
+    {id:"cheeseburger-beef",name:"Чизбургер говяжий",image:"assets/menu/cheeseburger-beef.webp",options:[{id:"1-patty",name:"1 котлета",price:1650},{id:"2-patties",name:"2 котлеты",price:2050}]}
   ]},
   { id:"sides", name:"Фри и снеки", icon:"🍟", items:[
     {id:"fries-medium",name:"Фри средний",price:700,image:"assets/menu/fries.webp"},
@@ -102,7 +105,20 @@ const categories = [
   { id:"east", name:"Восточка", icon:"🍜", items:[
     {id:"lagman-guyru",name:"Гуйру лағман",price:1600,image:"assets/menu/guyru-lagman.webp"},{id:"lagman-suyru",name:"Суйру лағман",price:1600,image:"assets/menu/suyru-lagman.webp"},
     {id:"lagman-guyru-tsomyan",name:"Гуйру цомян",price:1800,image:"assets/menu/guyru-tsomyan.webp"},{id:"lagman-suyru-tsomyan",name:"Суйру цомян",price:1800,image:"assets/menu/suyru-tsomyan.webp"},
-    {id:"lagman-moguru",name:"Могуру",price:1900,image:"assets/menu/moguru.webp"},{id:"lagman-moshuru",name:"Мошуру",price:2000,image:"assets/menu/moshuru.webp"},{id:"lagman-hauhau",name:"Хаухау",price:2000,image:"assets/menu/hauhau.webp"}
+    {id:"lagman-moguru",name:"Могуру",price:1900,image:"assets/menu/moguru.webp"},{id:"lagman-moshuru",name:"Мошуру",price:2000,image:"assets/menu/moshuru.webp"},{id:"lagman-hauhau",name:"Хаухау",price:2000,image:"assets/menu/hauhau.webp"},
+    {id:"chicken-mushroom-cream",name:"Курица с грибами в сливочном соусе",price:2600,image:"assets/menu/chicken-mushroom-cream.webp"},
+    {id:"hoshan",name:"Хошан",price:2200,image:"assets/menu/hoshan.webp"},
+    {id:"manty",name:"Манты",price:2000,image:"assets/menu/manty.webp"},
+    {id:"fries-meat",name:"Фри с мясом",price:2200,image:"assets/menu/fries-meat.webp"},
+    {id:"thai-meat",name:"Мясо по-тайски",price:2200,image:"assets/menu/thai-meat.webp"},
+    {id:"tai-kuirdak",name:"Тай қуырдақ",price:3100,image:"assets/menu/tai-kuirdak.webp"},
+    {id:"plov",name:"Плов",price:2500,image:"assets/menu/plov.webp"}
+  ]},
+  { id:"salads", name:"Салаты", icon:"🥗", items:[
+    {id:"salad-crispy-eggplant",name:"Хрустящий баклажан",price:2200,image:"assets/menu/crispy-eggplant.webp"},
+    {id:"salad-caesar-chicken",name:"Цезарь с курицей",price:2500,image:"assets/menu/caesar-chicken-salad.webp"},
+    {id:"salad-gnezdo",name:"Гнездо глухаря",price:2300,image:"assets/menu/gnezdo-glukharya.webp"},
+    {id:"salad-greek",name:"Греческий",price:2100,image:"assets/menu/greek-salad.webp"}
   ]},
   { id:"fish", name:"Рыба", icon:"🐟", items:[
     {id:"fish-sudak",name:"Судак",image:"assets/menu/fish-assorti.webp",options:[{id:"500g",name:"500 г",price:3300},{id:"700g",name:"700 г",price:4100},{id:"1kg",name:"1 кг",price:6100},{id:"1.5kg",name:"1.5 кг",price:8800}]},
@@ -155,6 +171,7 @@ function renderNavigation(){
     `<button class="category" data-target="category-doner">🌯 Фастфуд</button>`,
     `<button class="category" data-target="category-sushi">🍣 Суши</button>`,
     `<button class="category" data-target="category-east">🍜 Восточка</button>`,
+    `<button class="category" data-target="category-salads">🥗 Салаты</button>`,
     `<button class="category" data-target="category-fish">🐟 Рыба</button>`,
     `<button class="category" data-target="category-drinks">🥤 Напитки</button>`
   ].join("");
@@ -224,11 +241,11 @@ function openCheckout(){if(!cart.length)return;closeCart();syncCheckoutFields();
 
 function getAlmatyHour(date=new Date()){return Number(new Intl.DateTimeFormat("en-GB",{timeZone:"Asia/Almaty",hour:"2-digit",hour12:false}).format(date))}
 function calculateDeliveryFee(zone,subtotal,date=new Date()){if(zone!=="baktybai")return zoneRules[zone]?.fee??0;return getAlmatyHour(date)<17&&subtotal>=3000?0:500}
-function calculateServiceFee(orderType,subtotal){return orderType==="В заведении"?Math.round(subtotal*.10):0}
-function getCheckoutState(date=new Date()){const orderType=document.querySelector('input[name="orderType"]:checked')?.value||"В заведении";const zone=document.getElementById("delivery-zone").value;const subtotal=productsSubtotal();const serviceFee=calculateServiceFee(orderType,subtotal);const deliveryFee=orderType==="Доставка"?calculateDeliveryFee(zone,subtotal,date):0;return{orderType,zone,zoneName:zoneRules[zone].name,subtotal,serviceFee,deliveryFee,total:subtotal+serviceFee+deliveryFee}}
-function updateCheckoutSummary(){const state=getCheckoutState();document.getElementById("checkout-products-total").textContent=money(state.subtotal);document.getElementById("checkout-service-fee").textContent=state.orderType==="В заведении"?money(state.serviceFee):"—";document.getElementById("checkout-delivery-fee").textContent=state.orderType==="Доставка"?(state.deliveryFee===0?"Бесплатно":money(state.deliveryFee)):"—";document.getElementById("checkout-grand-total").textContent=money(state.total);document.getElementById("delivery-explanation").textContent=deliveryExplanation(state);document.getElementById("cash-caption").textContent=state.orderType==="Доставка"?"Оплата курьеру":"Оплата кассиру"}
+function calculateServiceFee(){return 0}
+function getCheckoutState(date=new Date()){const orderType="Доставка";const zone=document.getElementById("delivery-zone").value;const subtotal=productsSubtotal();const serviceFee=0;const deliveryFee=calculateDeliveryFee(zone,subtotal,date);return{orderType,zone,zoneName:zoneRules[zone].name,subtotal,serviceFee,deliveryFee,total:subtotal+deliveryFee}}
+function updateCheckoutSummary(){const state=getCheckoutState();document.getElementById("checkout-products-total").textContent=money(state.subtotal);document.getElementById("checkout-delivery-fee").textContent=state.deliveryFee===0?"Бесплатно":money(state.deliveryFee);document.getElementById("checkout-grand-total").textContent=money(state.total);document.getElementById("delivery-explanation").textContent=deliveryExplanation(state)}
 function deliveryExplanation(state){if(state.orderType!=="Доставка")return"";if(state.zone!=="baktybai")return`${state.zoneName}: фиксированная доставка ${money(state.deliveryFee)}.`;const before=getAlmatyHour()<17;if(before&&state.deliveryFee===0)return"Бақтыбай: до 17:00 и товары от 3 000 ₸ — доставка бесплатная.";if(before)return"Бақтыбай: до 17:00 при сумме товаров меньше 3 000 ₸ доставка 500 ₸.";return"Бақтыбай: после 17:00 доставка 500 ₸ независимо от суммы."}
-function syncCheckoutFields(){const delivery=document.querySelector('input[name="orderType"]:checked').value==="Доставка";document.getElementById("table-field").style.display=delivery?"none":"block";document.getElementById("delivery-fields").style.display=delivery?"block":"none";updateCheckoutSummary()}
+function syncCheckoutFields(){updateCheckoutSummary()}
 
 async function postRpc(name,body){return fetch(`${SUPABASE_URL}/rest/v1/rpc/${name}`,{method:"POST",headers:{"Content-Type":"application/json",apikey:SUPABASE_ANON_KEY,Authorization:`Bearer ${SUPABASE_ANON_KEY}`},body:JSON.stringify(body)})}
 async function saveOrderToSupabase(order){
@@ -244,16 +261,16 @@ function openKaspiPay(targetWindow=null){if(targetWindow&&!targetWindow.closed){
 async function saveOrderAndOpenPayment(payment,order,{save=saveOrderToSupabase,openKaspi=openKaspiPay,targetWindow=null}={}){try{const saved=await save(order);if(payment==="Kaspi перевод")openKaspi(targetWindow);return saved}catch(error){if(targetWindow&&!targetWindow.closed)targetWindow.close();throw error}}
 
 function calculateCashChange(total,mode,amount){if(mode!=="change")return{mode:"none",from:null,change:0,valid:true};const from=Number(amount);return{mode:"change",from:Number.isFinite(from)?from:null,change:Number.isFinite(from)?from-total:0,valid:Number.isFinite(from)&&from>=total}}
-function getCashChangeState(total=getCheckoutState().total){const payment=document.querySelector('input[name="payment"]:checked')?.value||"Наличными",mode=document.querySelector('input[name="cashChangeMode"]:checked')?.value||"none",amount=document.getElementById("cash-change-from").value;return payment==="Наличными"?calculateCashChange(total,mode,amount):{mode:null,from:null,change:0,valid:true}}
-function updateCashChange(){const payment=document.querySelector('input[name="payment"]:checked')?.value||"Наличными",cash=document.getElementById("cash-change"),mode=document.querySelector('input[name="cashChangeMode"]:checked')?.value||"none",wrap=document.getElementById("cash-change-amount-wrap"),result=document.getElementById("cash-change-result");cash.style.display=payment==="Наличными"?"block":"none";wrap.hidden=payment!=="Наличными"||mode!=="change";if(payment!=="Наличными"||mode!=="change"){result.textContent="";return}const change=getCashChangeState();result.textContent=change.valid?`Сдача: ${money(change.change)}`:"";result.classList.remove("error")}
+function getCashChangeState(){return{mode:null,from:null,change:0,valid:true}}
+function updateCashChange(){}
 
 async function sendOrder(){
   if(!cart.length)return;
-  const name=document.getElementById("customer-name").value.trim();const phone=document.getElementById("customer-phone").value.trim();const address=document.getElementById("customer-address").value.trim();const table=document.getElementById("table-number").value.trim();const payment=document.querySelector('input[name="payment"]:checked').value;const state=getCheckoutState();const cashChange=getCashChangeState(state.total);const error=document.getElementById("checkout-error");
-  error.style.display="none";if(!name)return showCheckoutError("Введите ваше имя.");if(state.orderType==="В заведении"&&!table)return showCheckoutError("Введите номер стола.");if(state.orderType==="Доставка"&&(!phone||!address))return showCheckoutError("Для доставки укажите телефон и адрес.");if(!cashChange.valid)return showCheckoutError("Сумма для сдачи не может быть меньше итога заказа.");
+  const name=document.getElementById("customer-name").value.trim();const phone=document.getElementById("customer-phone").value.trim();const address=document.getElementById("customer-address").value.trim();const payment="Kaspi перевод";const state=getCheckoutState();const cashChange=getCashChangeState();const error=document.getElementById("checkout-error");
+  error.style.display="none";if(!name)return showCheckoutError("Введите ваше имя.");if(!phone||!address)return showCheckoutError("Для доставки укажите телефон и адрес.");
   const button=document.getElementById("submit-order-button");button.disabled=true;button.textContent="Отправляем...";
   const kaspiWindow=payment==="Kaspi перевод"?window.open("about:blank","_blank"):null;
-  const items=getOrderItems();const order={customer_name:name,phone:state.orderType==="Доставка"?phone:null,order_type:state.orderType==="Доставка"?"delivery":"dine_in",table_number:state.orderType==="В заведении"?table:null,address:state.orderType==="Доставка"?address:null,items,items_subtotal:state.subtotal,delivery_zone:state.orderType==="Доставка"?state.zoneName:null,delivery_fee:state.deliveryFee,total:state.total,payment_method:payment==="Kaspi перевод"?"kaspi":"cash",cash_change_mode:payment==="Наличными"?cashChange.mode:null,cash_change_from:payment==="Наличными"?cashChange.from:null};
+  const items=getOrderItems();const order={customer_name:name,phone,order_type:"delivery",table_number:null,address,items,items_subtotal:state.subtotal,delivery_zone:state.zoneName,delivery_fee:state.deliveryFee,total:state.total,payment_method:"kaspi",cash_change_mode:null,cash_change_from:null};
   try{const saved=await saveOrderAndOpenPayment(payment,order,{targetWindow:kaspiWindow});hideModal("checkout-modal");showSuccess(saved.id,state,payment,order);cart=[];saveCart();refreshAll()}catch(submitError){console.error(submitError);showCheckoutError("Не удалось отправить заказ. Проверьте интернет и попробуйте ещё раз.")}finally{button.disabled=false;button.textContent="Отправить заказ"}
 }
 function showCheckoutError(message){const error=document.getElementById("checkout-error");error.textContent=message;error.style.display="block"}
@@ -269,7 +286,6 @@ if(typeof document!=="undefined"){
   document.querySelectorAll('input[name="orderType"]').forEach(input=>input.addEventListener("change",syncCheckoutFields));
   document.querySelectorAll('input[name="payment"]').forEach(input=>input.addEventListener("change",()=>{document.getElementById("kaspi-payment").style.display=input.checked&&input.value==="Kaspi перевод"?"block":"none";updateCashChange()}));
   document.querySelectorAll('input[name="cashChangeMode"]').forEach(input=>input.addEventListener("change",updateCashChange));
-  document.getElementById("cash-change-from").addEventListener("input",updateCashChange);
   document.getElementById("delivery-zone").addEventListener("change",updateCheckoutSummary);
   ["set-modal","customize-modal","cart-modal","checkout-modal"].forEach(id=>document.getElementById(id).addEventListener("click",event=>{if(event.target.id===id)hideModal(id)}));
   renderNavigation();renderMenu();refreshAll();syncCheckoutFields();updateCashChange();loadAvailability();initPasswordRecovery();setInterval(loadAvailability,15000);

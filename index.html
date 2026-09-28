@@ -113,14 +113,8 @@
     <div class="cart-box cart-large">
       <button class="close-cart" type="button" onclick="closeCheckout()">×</button>
       <h2>Оформление заказа</h2>
-      <div class="order-type">
-        <p>Как вы хотите получить заказ?</p>
-        <div class="choice-cards">
-          <label><input type="radio" name="orderType" value="В заведении" checked><span><b>В заведении</b><small>Номер стола</small></span></label>
-          <label><input type="radio" name="orderType" value="Доставка"><span><b>Доставка</b><small>Выберите зону</small></span></label>
-        </div>
-      </div>
-      <div id="table-field"><input type="number" id="table-number" placeholder="Номер стола" min="1"></div>
+      <input type="hidden" name="orderType" value="Доставка" checked>
+      <input type="hidden" name="payment" value="Kaspi перевод" checked>
       <input type="text" id="customer-name" placeholder="Ваше имя" autocomplete="name">
       <div id="delivery-fields" class="delivery-fields">
         <label class="field-label" for="delivery-zone">Зона доставки</label>
@@ -136,26 +130,10 @@
       </div>
       <div class="payment-method">
         <p>Способ оплаты</p>
-        <div class="choice-cards">
-          <label><input type="radio" name="payment" value="Наличными" checked><span><b>Наличные</b><small id="cash-caption">Оплата кассиру</small></span></label>
-          <label><input type="radio" name="payment" value="Kaspi перевод"><span><b>Kaspi перевод</b><small>После оформления откроется Kaspi Pay</small></span></label>
-        </div>
-      </div>
-      <div id="kaspi-payment"><p>Введите итоговую сумму заказа вручную.</p></div>
-      <div id="cash-change" class="cash-change">
-        <p>Нужна сдача?</p>
-        <div class="choice-cards">
-          <label><input type="radio" name="cashChangeMode" value="none" checked><span><b>Без сдачи</b><small>Оплачу точной суммой</small></span></label>
-          <label><input type="radio" name="cashChangeMode" value="change"><span><b>Нужна сдача</b><small>Укажите сумму</small></span></label>
-        </div>
-        <div id="cash-change-amount-wrap" hidden>
-          <input type="number" id="cash-change-from" min="0" step="10" inputmode="numeric" placeholder="Нужна сдача с ___ ₸">
-          <div id="cash-change-result" class="cash-change-result"></div>
-        </div>
+        <div class="kaspi-only-payment"><b>Kaspi перевод / Kaspi Red</b><small>После оформления откроется Kaspi Pay. Введите итоговую сумму заказа вручную.</small></div>
       </div>
       <div class="checkout-summary">
         <div><span>Товары</span><strong id="checkout-products-total">0 ₸</strong></div>
-        <div><span>Обслуживание 10%</span><strong id="checkout-service-fee">0 ₸</strong></div>
         <div><span>Доставка</span><strong id="checkout-delivery-fee">—</strong></div>
         <div class="checkout-grand"><span>Итого</span><strong id="checkout-grand-total">0 ₸</strong></div>
       </div>

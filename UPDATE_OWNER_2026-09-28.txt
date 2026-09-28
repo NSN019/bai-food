@@ -1,0 +1,22 @@
+BAI FOOD — owner-requested update
+
+Client checkout:
+- Delivery only.
+- Kaspi transfer / Kaspi Red only.
+- Cash payment and dine-in checkout removed from client UI.
+
+Menu:
+- Added Chicken Cheeseburger: 1 patty 1390, 2 patties 1690.
+- Added Beef Cheeseburger: 1 patty 1650, 2 patties 2050.
+- Added hot dishes and salads under Восточка.
+- Replaced Ayran, all doner, all 3 fish-card photos.
+- Replaced Roll Tobiko and Roll with cucumber photos.
+- Existing menu/prices kept unless explicitly changed above.
+
+Admin:
+- Preserved collapsed STOP-list and current cashier logic.
+
+Supabase:
+- Review and manually run supabase_patch_menu_owner_update.sql before publishing the new menu.
+- It adds new products to STOP-list catalog and canonical server-side price validation.
+- It does not delete old orders.
