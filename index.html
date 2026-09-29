@@ -11,18 +11,19 @@
   <header class="hero" id="home">
     <nav class="navbar">
       <a class="brand" href="#home">
-        <div class="brand-logo">B</div>
+        <div class="brand-logo"><img src="assets/bai-food-logo.png" alt="BAI FOOD"></div>
         <div class="brand-text"><strong>BAI FOOD</strong><span>BURGER · БАКТЫБАЙ</span></div>
       </a>
       <button class="menu-button" type="button" onclick="openCart()" aria-label="Открыть корзину">🛒 <b id="nav-cart-count">0</b></button>
     </nav>
     <div class="hero-content">
       <div class="open-badge">● Мы открыты!</div>
-      <h1>ВКУС, КОТОРЫЙ <span>ХОЧЕТСЯ ПОВТОРЯТЬ</span></h1>
-      <p class="hero-description">Донеры, пицца, бургеры, суши и горячие закуски с доставкой в Бактыбай и соседние районы.</p>
+      <p class="delivery-zones-hero">Бақтыбай · Елтай · Өтенай · Балпық Би · СХТ</p>
+      <h1>ТЕЗ ӘРІ <span>ДӘМДІ</span></h1>
+      <p class="hero-menu-types">Донер · Пицца · Суши · Лағман</p>
+      <p class="hero-description">Сүйікті тағамдарыңыз — тез дайындалып, ыстық күйінде жеткізіледі.</p>
       <div class="hero-info">
         <div><span class="info-icon">◷</span><span>10:00–22:00</span></div>
-        <div><span class="info-icon">🚚</span><span>4 зоны доставки</span></div>
         <a class="hero-phone" href="tel:+77781577796"><span class="info-icon">☎</span><span>+7 (778) 157-77-96</span></a>
       </div>
       <div class="hero-buttons">
@@ -35,7 +36,7 @@
     <button class="feature-item feature-button" type="button" onclick="document.getElementById('promotions').scrollIntoView({behavior:'smooth'})"><span>🔥</span><p><strong>Акции</strong><br>подарки к заказу</p></button>
     <div class="feature-item"><span>🚚</span><p>Доставка<br>по зонам</p></div>
     <div class="feature-item"><span>🍔</span><p>Большие<br>порции</p></div>
-    <div class="feature-item"><span>💳</span><p>Kaspi Red /<br>Наличные</p></div>
+    <div class="feature-item"><span>💳</span><p>Kaspi Red </p></div>
   </section>
 
   <section class="categories-section" id="menu">
@@ -46,8 +47,8 @@
   <section class="menu-section promotion-section" id="promotions">
     <div class="section-title"><h2>🔥 Акции</h2><span>Подарки добавятся автоматически</span></div>
     <div class="offers-grid">
-      <article class="offer-card offer-pepperoni"><div><h3>Пепперони в подарок</h3><strong>при заказе от 10 000 ₸*</strong><small>*Сеты и комбо не учитываются.</small></div></article>
-      <article class="offer-card offer-ayran"><div><h3>4 донера = 4 айрана в подарок</h3><strong>Любые 4 донера из обычного меню</strong><small>За каждые полные 4 донера. Сеты не учитываются.</small></div></article>
+      <article class="offer-card offer-pepperoni"><div><h3>🎁 Пепперони в подарок</h3><strong>при заказе от 10 000 ₸*</strong><small>*Сеты и комбо не учитываются.</small></div></article>
+      <article class="offer-card offer-ayran"><div><h3>🎁 4 донера = 4 айрана в подарок</h3><strong>Любые 4 донера из обычного меню</strong><small>За каждые полные 4 донера. Сеты не учитываются.</small></div></article>
     </div>
   </section>
 
@@ -123,6 +124,7 @@
           <option value="eltai">Елтай</option>
           <option value="otenai">Өтенай</option>
           <option value="balpyk-bi">Балпық би</option>
+          <option value="sht">СХТ</option>
         </select>
         <input type="tel" id="customer-phone" placeholder="Номер телефона" autocomplete="tel">
         <input type="text" id="customer-address" placeholder="Адрес доставки" autocomplete="street-address">
@@ -165,6 +167,8 @@
       <button id="recovery-save-button" class="checkout-button" type="button" onclick="saveRecoveredPassword()">Сохранить пароль</button>
     </div>
   </div>
+
+  <a class="floating-phone" href="tel:+77781577796" aria-label="Позвонить в BAI FOOD">☎</a>
 
   <script src="script.js"></script>
 </body>
