@@ -200,7 +200,7 @@ const categories = [
         id:"pizza-margarita",
         name:"Маргарита",
         price:2500,
-        image:"assets/menu/pizza-margarita.webp"
+        image:"assets/menu/pizza-margarita.png"
       },
       {
         id:"pizza-mushroom",
@@ -260,7 +260,7 @@ const categories = [
         id:"pizza-assorti",
         name:"Ассорти",
         price:3500,
-        image:"assets/menu/pizza-assorti.webp"
+        image:"assets/menu/pizza-assorti.png"
       }
     ]
   },
@@ -998,8 +998,24 @@ function productsSubtotal(){
   );
 }
 
+function pizzaQuantity(){
+  return cart
+    .filter(
+      row =>
+        productIndex.get(row.productId)?.categoryId === "pizza"
+    )
+    .reduce(
+      (sum, row) => sum + row.quantity,
+      0
+    );
+}
+
+function freePepperoniQuantity(){
+  return Math.floor(pizzaQuantity() / 4);
+}
+
 function qualifiesForGift(){
-  return ordinarySubtotal() > GIFT_THRESHOLD;
+  return freePepperoniQuantity() > 0;
 }
 
 function donerQuantity(){
@@ -2586,29 +2602,24 @@ function renderCart(){
       "gift-progress"
     );
 
-  const pepperoniText =
-    qualifiesForGift()
-      ? `
-        Пепперони добавлена.
-        Обычные товары:
-        <strong>${money(ordinary)}</strong>.
-      `
-      : `
-        До подарочной Пепперони
-        не хватает
-        <strong>
-          ${
-            money(
-              Math.max(
-                0,
-                GIFT_THRESHOLD +
-                1 -
-                ordinary
-              )
-            )
-          }
-        </strong>.
-      `;
+  const pizzas = pizzaQuantity();
+const freePepperoni = freePepperoniQuantity();
+
+const pepperoniText =
+  freePepperoni > 0
+    ? `
+      🎁 Пепперони добавлено:
+      <strong>${freePepperoni}</strong>.
+      Отдельных пицц в корзине:
+      <strong>${pizzas}</strong>.
+      Сеты и комбо не учитываются.
+    `
+    : `
+      🍕 До подарочной Пепперони
+      не хватает
+      <strong>${4 - pizzas} пицц.</strong>
+      Сеты и комбо не учитываются.
+    `;
 
   const ayranText =
     freeAyran

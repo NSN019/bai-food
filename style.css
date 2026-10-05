@@ -80,3 +80,13 @@
   object-fit: contain !important;
   transform: none !important;
 }
+/* Маргарита және Ассорти — басқа пиццалармен бірдей өлшем */
+.product[data-product-id="pizza-margarita"] .product-image img,
+.product[data-product-id="pizza-assorti"] .product-image img {
+  width: 85%;
+  height: 85%;
+  object-fit: contain;
+  margin: auto;
+  display: block;
+  transform: translateY(12px);
+}
