@@ -3,6 +3,45 @@ const SUPABASE_ANON_KEY = "sb_publishable_mYQEwkMK_Bk4SxQFilnr3w_rxXasqvw";
 
 let currentFilter="waiting",selectedOrderId=null,selectedAcceptOrderId=null,selectedRejectOrderId=null,orders=[];
 let accessToken=typeof localStorage!=="undefined"?localStorage.getItem("baiFoodAdminAccessToken"):null;
+const ADMIN_REFRESH_KEY="baiFoodAdminRefreshToken";
+const ADMIN_EXPIRY_KEY="baiFoodAdminExpiresAt";
+let tokenRefreshPromise=null;
+function saveAdminSession(data){
+  accessToken=data.access_token;
+  localStorage.setItem("baiFoodAdminAccessToken",accessToken);
+  if(data.refresh_token)localStorage.setItem(ADMIN_REFRESH_KEY,data.refresh_token);
+  if(data.expires_in)localStorage.setItem(ADMIN_EXPIRY_KEY,String(Date.now()+Number(data.expires_in)*1000));
+}
+function clearAdminSession(){
+  accessToken=null;
+  localStorage.removeItem("baiFoodAdminAccessToken");
+  localStorage.removeItem(ADMIN_REFRESH_KEY);
+  localStorage.removeItem(ADMIN_EXPIRY_KEY);
+}
+async function refreshAdminSession(){
+  if(tokenRefreshPromise)return tokenRefreshPromise;
+  const refreshToken=localStorage.getItem(ADMIN_REFRESH_KEY);
+  if(!refreshToken)return false;
+  tokenRefreshPromise=(async()=>{
+    try{
+      const response=await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`,{
+        method:"POST",headers:{"Content-Type":"application/json",apikey:SUPABASE_ANON_KEY},
+        body:JSON.stringify({refresh_token:refreshToken})
+      });
+      if(!response.ok){if(response.status===400||response.status===401)clearAdminSession();return false}
+      const data=await response.json();
+      if(!await verifyCashier(data.access_token)){clearAdminSession();return false}
+      saveAdminSession(data);return true;
+    }catch(error){console.warn("Session refresh unavailable",error);return false}
+  })();
+  try{return await tokenRefreshPromise}finally{tokenRefreshPromise=null}
+}
+async function ensureAdminSession(){
+  if(!accessToken)return refreshAdminSession();
+  const expiresAt=Number(localStorage.getItem(ADMIN_EXPIRY_KEY)||0);
+  if(expiresAt&&Date.now()>expiresAt-60000)return refreshAdminSession();
+  return true;
+}
 let refreshTimer=null,alarmTimer=null,audioContext=null,soundEnabled=false,soundPlaying=false,activeSoundNodes=[];
 let selectedDate=getLocalDateKey(new Date());
 
@@ -44,7 +83,7 @@ async function loginAdmin(email,password){
     if(!response.ok){setAuthMessage("login-error","Email или пароль неверный.",true);return false}
     const data=await response.json();
     if(!await verifyCashier(data.access_token)){setAuthMessage("login-error","У этого аккаунта нет доступа кассира.",true);return false}
-    accessToken=data.access_token;localStorage.setItem("baiFoodAdminAccessToken",accessToken);hideAuth();return true;
+    saveAdminSession(data);hideAuth();return true;
   }catch(error){console.error(error);setAuthMessage("login-error","Не удалось подключиться к серверу.",true);return false}
 }
 async function sendRecovery(email){
@@ -56,7 +95,7 @@ async function sendRecovery(email){
 async function updateRecoveredPassword(password){
   const response=await fetch(`${SUPABASE_URL}/auth/v1/user`,{method:"PUT",headers:{"Content-Type":"application/json",apikey:SUPABASE_ANON_KEY,Authorization:`Bearer ${accessToken}`},body:JSON.stringify({password})});
   if(!response.ok)throw new Error("Не удалось сохранить новый пароль. Откройте свежую ссылку восстановления.");
-  localStorage.removeItem("baiFoodAdminAccessToken");accessToken=null;
+  clearAdminSession();
 }
 
 
@@ -78,13 +117,20 @@ function isNewOrder(order){return Boolean(order&&!order.acceptedAt&&!order.cance
 function cancellationReasonLabel(reason){return({stop_list:"Позиция в стоп-листе",no_ingredients:"Нет ингредиентов",unreachable:"Не удалось связаться с клиентом",other:"Другая причина"})[reason]||"Причина не указана"}
 
 async function loadOrders(){
-  if(!accessToken){showAuthView("login");return}
-  try{const response=await fetch(`${SUPABASE_URL}/rest/v1/orders?select=*&order=created_at.desc&limit=200`,{headers:{apikey:SUPABASE_ANON_KEY,Authorization:`Bearer ${accessToken}`}});
-    if(response.status===401){localStorage.removeItem("baiFoodAdminAccessToken");accessToken=null;showAuthView("login");return}
+  if(!await ensureAdminSession()){if(!accessToken)showAuthView("login");return}
+  try{
+    const request=()=>fetch(`${SUPABASE_URL}/rest/v1/orders?select=*&order=created_at.desc&limit=200`,{headers:{apikey:SUPABASE_ANON_KEY,Authorization:`Bearer ${accessToken}`}});
+    let response=await request();
+    if(response.status===401){
+      if(await refreshAdminSession())response=await request();
+      else{if(!accessToken)showAuthView("login");return}
+    }
+    if(response.status===401){clearAdminSession();showAuthView("login");return}
     if(!response.ok)throw new Error(await response.text());
     orders=(await response.json()).map(normalizeOrder);renderOrders();syncAlarm();loadStopList();
   }catch(error){console.error(error);showToastMessage("Не удалось загрузить заказы",true)}
 }
+
 function getOrdersForSelectedDate(){return orders.filter(order=>orderDateKey(order.createdAt)===selectedDate)}
 
 function renderOrders(){
@@ -113,8 +159,8 @@ function renderOrders(){
 function setFilter(filter,button){currentFilter=filter;document.querySelectorAll(".tab").forEach(tab=>tab.classList.remove("active"));button.classList.add("active");renderOrders()}
 function showNewOrders(){currentFilter="waiting";document.querySelectorAll(".tab").forEach(tab=>tab.classList.toggle("active",tab.textContent.includes("Ожидают")));selectedDate=getLocalDateKey(new Date());updateDateUI();renderOrders();document.getElementById("orders").scrollIntoView({behavior:"smooth"})}
 
-async function patchOrder(orderId,changes){const response=await fetch(`${SUPABASE_URL}/rest/v1/orders?id=eq.${orderId}`,{method:"PATCH",headers:{"Content-Type":"application/json",apikey:SUPABASE_ANON_KEY,Authorization:`Bearer ${accessToken}`,Prefer:"return=minimal"},body:JSON.stringify(changes)});if(!response.ok)throw new Error(await response.text())}
-async function postAdminRpc(name,body){const response=await fetch(`${SUPABASE_URL}/rest/v1/rpc/${name}`,{method:"POST",headers:{"Content-Type":"application/json",apikey:SUPABASE_ANON_KEY,Authorization:`Bearer ${accessToken}`},body:JSON.stringify(body)});if(!response.ok)throw new Error(await response.text());return response}
+async function patchOrder(orderId,changes){await ensureAdminSession();const response=await fetch(`${SUPABASE_URL}/rest/v1/orders?id=eq.${orderId}`,{method:"PATCH",headers:{"Content-Type":"application/json",apikey:SUPABASE_ANON_KEY,Authorization:`Bearer ${accessToken}`,Prefer:"return=minimal"},body:JSON.stringify(changes)});if(!response.ok)throw new Error(await response.text())}
+async function postAdminRpc(name,body){await ensureAdminSession();const response=await fetch(`${SUPABASE_URL}/rest/v1/rpc/${name}`,{method:"POST",headers:{"Content-Type":"application/json",apikey:SUPABASE_ANON_KEY,Authorization:`Bearer ${accessToken}`},body:JSON.stringify(body)});if(!response.ok)throw new Error(await response.text());return response}
 function openAcceptModal(orderId){const order=orders.find(item=>String(item.id)===String(orderId));if(!isNewOrder(order))return;selectedAcceptOrderId=orderId;document.getElementById("accept-order-label").textContent=`Заказ №${orderId}: выберите время`;document.getElementById("accept-modal").style.display="flex"}
 function closeAcceptModal(){document.getElementById("accept-modal").style.display="none";selectedAcceptOrderId=null}
 async function confirmAcceptOrder(prepMinutes){if(![20,30,40,60,90].includes(Number(prepMinutes))||selectedAcceptOrderId==null)return;const orderId=selectedAcceptOrderId,order=orders.find(item=>String(item.id)===String(orderId));if(!isNewOrder(order)){closeAcceptModal();return}document.querySelectorAll(".prep-time-options button").forEach(button=>button.disabled=true);try{const acceptedAt=new Date().toISOString();await patchOrder(orderId,{accepted_at:acceptedAt,prep_minutes:Number(prepMinutes)});order.acceptedAt=acceptedAt;order.prepMinutes=Number(prepMinutes);closeAcceptModal();syncAlarm();await loadOrders();showToastMessage(`✓ Заказ принят · ${prepMinutes} минут`)}catch(error){console.error(error);showToastMessage("Не удалось принять. Проверьте SQL patch.",true)}finally{document.querySelectorAll(".prep-time-options button").forEach(button=>button.disabled=false)}}
@@ -135,7 +181,7 @@ function formatMoney(amount){return `${new Intl.NumberFormat("ru-RU").format(amo
 const STOP_PRODUCTS = [
   ["doner-chicken","Донер куриный"],["doner-beef","Донер говяжий"],["doner-assorti","Донер ассорти"],["strips","Стрипсы"],["sushi-philadelphia","Филадельфия"],["lagman-guyru","Гуйру лағман"],["lagman-suyru","Суйру лағман"],["lagman-guyru-tsomyan","Гуйру цомян"],["lagman-suyru-tsomyan","Суйру цомян"],["lagman-moguru","Могуру"],["lagman-moshuru","Мошуру"],["lagman-hauhau","Хаухау"],["fish-sudak","Судак"],["fish-sazan","Сазан"],["fish-assorti","Ассорти"]
 ];
-async function loadStopList(){if(!accessToken)return;try{const r=await fetch(`${SUPABASE_URL}/rest/v1/product_availability?select=product_id,display_name,is_stopped&order=display_name`,{headers:{apikey:SUPABASE_ANON_KEY,Authorization:`Bearer ${accessToken}`}});if(!r.ok)throw new Error(await r.text());const rows=await r.json(),box=document.getElementById("stop-list");box.innerHTML=rows.map(x=>`<div class="stop-row"><span>${escapeHTML(x.display_name||x.product_id)}</span><button class="${x.is_stopped?"stop-active":""}" onclick="setProductStop('${x.product_id}',${!x.is_stopped})">${x.is_stopped?"Снять со стопа":"СТОП"}</button></div>`).join("")}catch(e){console.warn(e)}}
+async function loadStopList(){if(!await ensureAdminSession())return;try{const r=await fetch(`${SUPABASE_URL}/rest/v1/product_availability?select=product_id,display_name,is_stopped&order=display_name`,{headers:{apikey:SUPABASE_ANON_KEY,Authorization:`Bearer ${accessToken}`}});if(!r.ok)throw new Error(await r.text());const rows=await r.json(),box=document.getElementById("stop-list");box.innerHTML=rows.map(x=>`<div class="stop-row"><span>${escapeHTML(x.display_name||x.product_id)}</span><button class="${x.is_stopped?"stop-active":""}" onclick="setProductStop('${x.product_id}',${!x.is_stopped})">${x.is_stopped?"Снять со стопа":"СТОП"}</button></div>`).join("")}catch(e){console.warn(e)}}
 async function setProductStop(productId,isStopped){try{await postAdminRpc("set_product_stop_v1",{p_product_id:productId,p_is_stopped:Boolean(isStopped)});await loadStopList();showToastMessage(isStopped?"Позиция поставлена в STOP":"Позиция снова доступна")}catch(e){console.error(e);showToastMessage("Не удалось изменить STOP-лист",true)}}
 
 function escapeHTML(value){return String(value).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;")}
@@ -149,7 +195,15 @@ async function enableOrderSound(){try{audioContext=audioContext||new(window.Audi
 function playOrderSignal(){if(!soundEnabled||!unacceptedOrders().length||!audioContext||soundPlaying)return;const now=audioContext.currentTime,master=audioContext.createGain();master.gain.setValueAtTime(.65,now);master.connect(audioContext.destination);const notes=[{t:0,f:783.99,d:.48},{t:.18,f:1046.5,d:.62},{t:.64,f:1318.51,d:.7}];soundPlaying=true;activeSoundNodes=[];notes.forEach(note=>{const oscillator=audioContext.createOscillator(),gain=audioContext.createGain();oscillator.type="sine";oscillator.frequency.setValueAtTime(note.f,now+note.t);gain.gain.setValueAtTime(.0001,now+note.t);gain.gain.exponentialRampToValueAtTime(.2,now+note.t+.018);gain.gain.exponentialRampToValueAtTime(.0001,now+note.t+note.d);oscillator.connect(gain).connect(master);oscillator.start(now+note.t);oscillator.stop(now+note.t+note.d+.03);activeSoundNodes.push(oscillator)});setTimeout(()=>{activeSoundNodes=[];soundPlaying=false},1500)}
 
 function startAutoRefresh(){if(refreshTimer)clearInterval(refreshTimer);refreshTimer=setInterval(()=>{if(accessToken)loadOrders()},5000)}
-async function startAdmin(){updateDateUI();if(parseRecoverySession()){showAuthView("recovery");return}if(accessToken){hideAuth();await loadOrders()}else showAuthView("login");startAutoRefresh()}
+async function startAdmin(){
+  updateDateUI();
+  if(parseRecoverySession()){showAuthView("recovery");return}
+  if(await ensureAdminSession()){
+    hideAuth();await loadOrders();
+  }else if(!accessToken){showAuthView("login")}
+  else{hideAuth();await loadOrders()}
+  startAutoRefresh();
+}
 if(typeof document!=="undefined"){
   authEl("login-form").addEventListener("submit",async event=>{event.preventDefault();setAuthMessage("login-error","");const button=authEl("login-button");button.disabled=true;const ok=await loginAdmin(authEl("login-email").value.trim(),authEl("login-password").value);button.disabled=false;if(ok){await loadOrders();startAutoRefresh()}});
   authEl("forgot-button").addEventListener("click",()=>{authEl("forgot-email").value=authEl("login-email").value.trim();setAuthMessage("forgot-message","");showAuthView("forgot")});
